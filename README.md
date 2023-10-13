@@ -6,7 +6,7 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 - **Version:** 0.0.1
 - **License:** MIT
-- **Copyright:** (c) 2023 Sasprosko/Hope
+- **Copyright:** (c) 2023 Sasprosko/Umut
 
 ### System Cleaning 🚮
 
