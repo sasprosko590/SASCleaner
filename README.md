@@ -25,4 +25,5 @@ The `clear` function manages the general cleaning process. It takes default fold
 
 ## Usage 🚀
 
-To use the script, you can call the `clear` function with the desired options.
+To use the code, you can call the `clear` function with the options you want, or if you don't know anything you can look in the `index.test.js` file.
+
