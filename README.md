@@ -21,7 +21,7 @@ The `clear` function manages the general cleaning process. It takes default fold
 - `openDismGetPackages`: Runs DISM to get a list of installed packages.
 - `openDismAddPackages`: Runs DISM to add packages.
 
-## Note: I recommend to always set "Dism" to "true"
+#### Note: I recommend to always set "Dism" to "true"
 
 ## Usage 🚀
 
