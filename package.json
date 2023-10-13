@@ -1,5 +1,5 @@
 {
-  "name": "sascleaner",
+  "name": "system-cleaner-optimizer",
   "version": "0.0.1",
   "description": "This script was created to restore the computer to the fast, pure and regular performance as it was when it was first purchased.",
   "main": "index.js",
