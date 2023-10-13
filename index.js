@@ -173,12 +173,12 @@ async function clear({
         "DISM Repair"
       );
     if (openDismGetPackages)
-      await openDismGetPackages(
+      await openTool(
         "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /get-packages' -Wait }\"",
         "DISM Get Packages"
       );
     if (openDismAddPackages)
-      await openDismAddPackages(
+      await openTool(
         "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /add-package /packagepath:C:\\path\\to\\update.cab' -Wait }\"",
         "DISM Add Packages"
       );
