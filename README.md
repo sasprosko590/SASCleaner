@@ -6,7 +6,7 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 - **Version:** 0.0.1
 - **License:** MIT
-- **Copyright:** (c) 2023 Sasprosko/Umut
+- **Copyright:** (c) 2023 Sasprosko/Hope
 
 ### System Cleaning 🚮
 
@@ -21,9 +21,11 @@ The `clear` function manages the general cleaning process. It takes default fold
 - `openDismGetPackages`: Runs DISM to get a list of installed packages.
 - `openDismAddPackages`: Runs DISM to add packages.
 
-#### Note: I recommend to always set "Dism" to "true"
+#### Notes
+
+- I recommend to always set "Dism" to "true",
+- I don't have any bad intentions, there is no bad software in the code, and there is no such thing as taking the user's name in the code.
 
 ## Usage 🚀
 
 To use the code, you can call the `clear` function with the options you want, or if you don't know anything you can look in the `index.test.js` file.
-
