@@ -4,7 +4,7 @@
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.1
+- **Version:** 0.0.2
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Hope
 
@@ -16,6 +16,7 @@ The `clear` function manages the general cleaning process. It takes default fold
 
 - I recommend to always set "Dism" to "true",
 - I don't have any bad intentions, there is no bad software in the code, and there is no such thing as taking the user's name in the code.
+- Update your drivers.
 - Close unnecessary startup programs in the task manager.
 - Empty the trash can.
 - Check for windows updates.
@@ -32,4 +33,4 @@ The `clear` function manages the general cleaning process. It takes default fold
 
 ## Usage 🚀
 
-To use the code, you can call the `clear` function with the options you want, or if you don't know anything you can look in the `index.test.js` file.
+if you don't know anything you can look in the `index.test.js` file.
