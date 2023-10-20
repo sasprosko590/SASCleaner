@@ -1,6 +1,7 @@
 import os
 import asyncio
 import subprocess
+import shlex
 async def delete_files_in_folder(folder_path):
     try:
         folders_to_delete = await default_folders()
@@ -53,7 +54,7 @@ async def delete_files_in_default_folders():
 
 async def open_tool(tool_command, tool_display_name):
     try:
-        subprocess.run(tool_command, shell=True, check=True)
+        subprocess.run(shlex.split(tool_command), check=True)
         print(f"{tool_display_name} başarıyla açıldı.")
     except Exception as error:
         print(f"{tool_display_name} açılırken hata oluştu: {error}")
