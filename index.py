@@ -2,6 +2,7 @@ import os
 import asyncio
 import subprocess
 import shlex
+
 async def delete_files_in_folder(folder_path):
     try:
         folders_to_delete = await default_folders()
@@ -60,7 +61,9 @@ async def open_tool(tool_command, tool_display_name):
         print(f"{tool_display_name} açılırken hata oluştu: {error}")
 
 async def run_powershell_command(command, verb='RunAs'):
-    powershell_command = f'powershell -Command "& {{ Start-Process cmd.exe -Verb {verb} -ArgumentList \'/c\', \'{command}\' -Wait }}"'
+    powershell_command = (
+        f'powershell -Command "& {{ Start-Process cmd.exe -Verb {verb} -ArgumentList \'/c\', \'{command}\' -Wait }}"'
+    )
     await open_tool(powershell_command, command)
 
 async def clear(options=None):
