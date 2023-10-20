@@ -1,12 +1,11 @@
 import os
-import subprocess
 import asyncio
 
 async def delete_files_in_folder(folder_path):
     try:
         command = f'Get-ChildItem -Path "{folder_path}\\*" | ForEach-Object {{ Remove-Item $_.FullName -Force -Recurse -ErrorAction SilentlyContinue -Verbose }}'
-        subprocess.run(['powershell', '-Command', command], check=True, shell=True)
-    except subprocess.CalledProcessError as error:
+        os.system(f'powershell -Command "{command}"')
+    except Exception as error:
         print(f"Error deleting files in {folder_path}: {error}")
 
 async def default_folders():
@@ -32,9 +31,9 @@ async def delete_files_in_default_folders():
 
 async def open_tool(tool_command, tool_display_name):
     try:
-        subprocess.run(tool_command, shell=True, check=True)
+        os.system(tool_command)
         print(f"{tool_display_name} opened successfully.")
-    except subprocess.CalledProcessError as error:
+    except Exception as error:
         print(f"Error opening {tool_display_name}: {error}")
 
 async def run_powershell_command(command, verb='RunAs'):
@@ -110,8 +109,8 @@ async def clear(options=None):
                 await run_powershell_command('sfc /scannow', 'RunAs')
             if options.get('updateCheckWindowsUpdate', False):
                 await run_powershell_command('wuauclt.exe /detectnow', 'RunAs')
-        except subprocess.CalledProcessError as error:
-            print("Error while opening tools:", error)
+        except Exception as error:
+            print(f"An error occurred: {error}")
 
         await delete_files_in_default_folders()
 
