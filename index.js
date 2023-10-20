@@ -1,7 +1,7 @@
 /**
  * @author Sasprosko
  * @description I coded it to bring the computer back to fast performance, pure, tidy, like when you first bought it. I have absolutely no bad intentions and there is no bad software in the code.
- * @version 0.0.2
+ * @version 0.0.3
  * @copyright (c) 2023 Sasprosko/Umut
  * @license MIT
  * @file LICENSE
@@ -180,6 +180,10 @@ const openTool = async (toolCommand, toolDisplayName) => {
  * @param {boolean} [options.clearSpotifyData=false] - Whether to clear Spotify data.
  * @param {boolean} [options.clearWindows10Upgrade=false] - Whether to clear the Windows10Upgrade folder.
  * @param {boolean} [options.clearWindowsOld=false] - Whether to clear the Windows.old folder.
+ * @param {boolean} [options.clearWindowsUpdate=false] - Whether Windows Update will be cleaned.
+ * @param {boolean} [options.openCDF=false] - Whether to open the Change Directory Fast (CDF) tool.
+ * @param {boolean} [options.openCDR=false] - Whether to open the Change Directory Recursive (CDR) tool.
+ * @param {boolean} [options.openCDX=false] - Whether to open the Change Directory Extended (CDX) tool.
  * @param {boolean} [options.openDiskCleaner=false] - Whether to open the Disk Cleaner tool.
  * @param {boolean} [options.openDismAddPackages=false] - Whether to run DISM to add a package.
  * @param {boolean} [options.openDismCheckHealth=false] - Whether to run DISM for health checking.
@@ -189,11 +193,16 @@ const openTool = async (toolCommand, toolDisplayName) => {
  * @param {boolean} [options.openMDT=false] - Whether to open the Memory Diagnostic Tool (MDT).
  * @param {boolean} [options.openMRT=false] - Whether to open the Malicious Software Removal Tool (MRT).
  * @param {boolean} [options.openSFC=false] - Whether to run the System File Checker (SFC) tool.
+ * @param {boolean} [options.updateCheckWindowsUpdate= false] - Whether Windows update will check for updates.
  */
 async function clear({
   clearSpotifyData = false,
   clearWindows10Upgrade = false,
   clearWindowsOld = false,
+  clearWindowsUpdate = false,
+  openCDF = false,
+  openCDR = false,
+  openCDX = false,
   openDiskCleaner = false,
   openDismAddPackages = false,
   openDismCheckHealth = false,
@@ -203,6 +212,7 @@ async function clear({
   openMDT = false,
   openMRT = false,
   openSFC = false,
+  updateCheckWindowsUpdate = false,
 } = {}) {
   // Retrieve default folders
   let folders = await defaultFolders();
@@ -255,6 +265,26 @@ async function clear({
 
   // Open selected tools
   try {
+    if (clearWindowsUpdate)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /startcomponentcleanup' -Wait }\"",
+        "Windows Update"
+      );
+    if (openCDF)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /f' -Wait }\"",
+        "Check Disk"
+      );
+    if (openCDR)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /r' -Wait }\"",
+        "Check Disk"
+      );
+    if (openCDX)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /x' -Wait }\"",
+        "Check Disk"
+      );
     if (openDismAddPackages)
       await openTool(
         "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /add-package /packagepath:C:\\path\\to\\update.cab' -Wait }\"",
@@ -291,6 +321,11 @@ async function clear({
       await openTool(
         "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'sfc /scannow' -Wait }\"",
         "'sfc /scannow'"
+      );
+    if (updateCheckWindowsUpdate)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'wuauclt.exe /detectnow' -Wait }\"",
+        "Check Win Update"
       );
   } catch (error) {
     console.error("Error while opening tools:", error.message);

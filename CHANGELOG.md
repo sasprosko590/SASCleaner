@@ -1,3 +1,3 @@
 # CHANGELOG
 
-Version 0.0.2 = added new DISM cmd commands, added command to delete spotifyData and cache. Added cmd command to repair ram.
+Version 0.0.3 = Added system-cleaner-optimizer for py and added extra dismler added disk repair commands added errors updated (note: I did it with help from chatgpt since I am new to py, thanks to chatgpt)

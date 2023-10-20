@@ -4,7 +4,7 @@
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.2
+- **Version:** 0.0.3
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
@@ -34,3 +34,4 @@ The `clear` function manages the general cleaning process. It takes default fold
 ## Usage 🚀
 
 if you don't know anything you can look in the `index.test.js` file.
+If you don't know anything, you can do it by running `index.py` and confirming all the cmds that appear in front of you. (note: I got support from chatgpt because I am new to py. thanks chatgpt.)

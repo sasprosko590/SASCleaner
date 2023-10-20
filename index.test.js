@@ -1,5 +1,4 @@
 const cleaner = require("./index");
-
 async function runExample() {
   try {
     console.log("Running system cleanup and optimization script...");
@@ -8,6 +7,10 @@ async function runExample() {
       clearSpotifyData: true,
       clearWindows10Upgrade: true,
       clearWindowsOld: true,
+      clearWindowsUpdate: true,
+      openCDF: true,
+      openCDR: true,
+      openCDX: true,
       openDiskCleaner: true,
       openDismAddPackages: true,
       openDismCheckHealth: true,
@@ -17,6 +20,7 @@ async function runExample() {
       openMDT: true,
       openMRT: true,
       openSFC: true,
+      updateCheckWindowsUpdate: true,
     };
 
     await cleaner.clear(options);
