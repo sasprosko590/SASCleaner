@@ -1,10 +1,32 @@
 import os
 import asyncio
-
+import subprocess
 async def delete_files_in_folder(folder_path):
     try:
-        command = f'Get-ChildItem -Path "{folder_path}\\*" | ForEach-Object {{ Remove-Item $_.FullName -Force -Recurse -ErrorAction SilentlyContinue -Verbose }}'
-        os.system(f'powershell -Command "{command}"')
+        folders_to_delete = await default_folders()
+        
+        if folder_path in folders_to_delete:
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    try:
+                        file_path = os.path.join(root, file)
+                        os.remove(file_path)
+                        print(f"Deleted file: {file_path}")
+                    except Exception as error:
+                        print(f"Error deleting file: {file_path}, {error}")
+                    
+                for dir in dirs:
+                    try:
+                        dir_path = os.path.join(root, dir)
+                        os.rmdir(dir_path)
+                        print(f"Deleted directory: {dir_path}")
+                    except Exception as error:
+                        print(f"Error deleting directory: {dir_path}, {error}")
+
+            print(f"Deleted files in {folder_path}")
+        else:
+            print(f"Skipping deletion for {folder_path}")
+
     except Exception as error:
         print(f"Error deleting files in {folder_path}: {error}")
 
@@ -31,10 +53,10 @@ async def delete_files_in_default_folders():
 
 async def open_tool(tool_command, tool_display_name):
     try:
-        os.system(tool_command)
-        print(f"{tool_display_name} opened successfully.")
+        subprocess.run(tool_command, shell=True, check=True)
+        print(f"{tool_display_name} başarıyla açıldı.")
     except Exception as error:
-        print(f"Error opening {tool_display_name}: {error}")
+        print(f"{tool_display_name} açılırken hata oluştu: {error}")
 
 async def run_powershell_command(command, verb='RunAs'):
     powershell_command = f'powershell -Command "& {{ Start-Process cmd.exe -Verb {verb} -ArgumentList \'/c\', \'{command}\' -Wait }}"'
