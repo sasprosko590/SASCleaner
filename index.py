@@ -53,8 +53,19 @@ async def delete_files_in_default_folders():
 
 async def open_tool(tool_command, tool_display_name):
     try:
-        os.startfile(tool_command)
-        print(f"{tool_display_name} başarıyla açıldı.")
+        process = await asyncio.create_subprocess_exec(
+            *tool_command.split(),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        _, _ = await process.communicate()
+
+        if process.returncode == 0:
+            print(f"{tool_display_name} başarıyla açıldı.")
+        else:
+            print(f"{tool_display_name} açılırken hata oluştu. Hata kodu: {process.returncode}")
+
     except Exception as error:
         print(f"{tool_display_name} açılırken hata oluştu: {error}")
 
