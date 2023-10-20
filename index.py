@@ -53,7 +53,7 @@ async def delete_files_in_default_folders():
 
 async def open_tool(tool_command, tool_display_name):
     try:
-        os.system(tool_command)
+        os.startfile(tool_command)
         print(f"{tool_display_name} başarıyla açıldı.")
     except Exception as error:
         print(f"{tool_display_name} açılırken hata oluştu: {error}")
