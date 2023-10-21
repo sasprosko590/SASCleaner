@@ -1,5 +1,3 @@
-# system-cleaner-optimizer
-I coded it to bring the computer back to fast performance, pure, tidy, like when you first bought it. I have absolutely no bad intentions and there is no bad software in the code.
 # System Cleanup and Optimization Script 🚀
 
 ## Overview 🌐
@@ -9,8 +7,6 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 - **Version:** 0.0.3
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
-
-### System Cleaning 🚮
 
 #### Notes
 
@@ -33,5 +29,4 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 ## Usage 🚀
 
-- If you don't know anything you can look in the `index.test.js` file.
 - You can also run it easily with `start_cleanup.bat` but restart the PC after you have done all that.
