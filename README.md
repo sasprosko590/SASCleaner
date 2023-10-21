@@ -34,5 +34,4 @@ The `clear` function manages the general cleaning process. It takes default fold
 ## Usage 🚀
 
 - If you don't know anything you can look in the `index.test.js` file.
-- If you don't know anything, you can do it by running `index.py` and confirming all the cmds that appear in front of you. (note: I got support from chatgpt because I am new to py. thanks chatgpt.)
 - You can also run it easily with `start_cleanup.bat` but restart the PC after you have done all that.
