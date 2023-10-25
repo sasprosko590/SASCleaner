@@ -1,4 +1,4 @@
-const cleaner = require("./index");
+const cleaner = require("./index.js");
 async function runExample() {
   try {
     console.log("Running SASPClean script...");

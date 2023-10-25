@@ -30,3 +30,4 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 ## Usage 🚀
 
 - Type 'npm i' in the terminal and install the modules
+- You can also run it easily with `start_cleanup.bat` but restart the PC after you have done all that.
