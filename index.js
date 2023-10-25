@@ -12,7 +12,7 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const UserAgent = require("user-agents");
 
-async function generateRandomUserAgent() {
+async function RandomUserAgent() {
   const userAgent = new UserAgent();
   return userAgent.toString();
 }
@@ -27,7 +27,7 @@ async function checkLatestVersion(currentVersion) {
     //const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
 
     const headers = {
-      "User-Agent": await generateRandomUserAgent(),
+      "User-Agent": await RandomUserAgent(),
     };
 
     https
@@ -248,7 +248,6 @@ async function openTool(toolCommand, toolDisplayName) {
 
 /**
  * Clears specified folders, opens selected tools, and performs additional cleanup actions.
- *
  * @param {Object} [options={}] - Options for controlling the clearing and tool opening process.
  * @param {boolean} [options.clearSpotifyData=false] - Whether to clear Spotify data.
  * @param {boolean} [options.clearWindows10Upgrade=false] - Whether to clear the Windows10Upgrade folder.
