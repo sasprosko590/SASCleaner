@@ -1,7 +1,7 @@
 const cleaner = require("./index");
 async function runExample() {
   try {
-    console.log("Running system cleanup and optimization script...");
+    console.log("Running SASPClean script...");
 
     const options = {
       clearSpotifyData: true,
@@ -20,17 +20,16 @@ async function runExample() {
       openMDT: true,
       openMRT: true,
       openSFC: true,
+      openWF: true,
+      openWingetUpgrade: true,
       updateCheckWindowsUpdate: true,
     };
 
     await cleaner.clear(options);
 
-    console.log("System cleanup and optimization completed successfully!");
+    console.log("SASPClean completed successfully!");
   } catch (error) {
-    console.error(
-      "Error during system cleanup and optimization:",
-      error.message
-    );
+    console.error("Error during SASPClean:", error.message);
   }
 }
 

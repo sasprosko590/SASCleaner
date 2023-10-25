@@ -1,14 +1,14 @@
-# System Cleanup and Optimization Script 🚀
+# SASPClean Script 🚀
 
 ## Overview 🌐
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.3
+- **Version:** 0.0.4
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
-#### Notes
+### Notes
 
 - I recommend to always set "Dism" to "true",
 - I don't have any bad intentions, there is no bad software in the code, and there is no such thing as taking the user's name in the code.

@@ -6,13 +6,13 @@ Our project currently supports the following version:
 
 | Version | Supported |
 | ------- | ------------------- |
-| 0.0.3 | :white_check_mark: |
+| 0.0.4 | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
 You can follow the steps below to share vulnerabilities with us:
 
-1. Report the vulnerability on [GitHub Issues](https://github.com/sasprosko590/SASCleaner/issues).
+1. Report the vulnerability on [GitHub Issues](https://github.com/sasprosko590/SASPClean/issues).
 
 2. Write a detailed title and description of your vulnerability. If possible, describe how you discovered the vulnerability and possible attack scenarios.
 

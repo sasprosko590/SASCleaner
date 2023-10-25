@@ -1,13 +1,84 @@
 /**
  * @author Sasprosko
  * @description I coded it to bring the computer back to fast performance, pure, tidy, like when you first bought it. I have absolutely no bad intentions and there is no bad software in the code.
- * @version 0.0.3
+ * @version 0.0.4
  * @copyright (c) 2023 Sasprosko/Umut
  * @license MIT
  * @file LICENSE
  */
+
+const https = require("https");
 const fs = require("fs");
 const { exec } = require("child_process");
+const UserAgent = require("user-agents");
+
+async function generateRandomUserAgent() {
+  const userAgent = new UserAgent();
+  return userAgent.toString();
+}
+
+/**
+ * Checks the latest version of a GitHub repository.
+ *
+ * @param {string} currentVersion - The current version of the project.
+ */
+async function checkLatestVersion(currentVersion) {
+  try {
+    //const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
+
+    const headers = {
+      "User-Agent": await generateRandomUserAgent(),
+    };
+
+    https
+      .get(
+        {
+          hostname: "api.github.com",
+          path: `/repos/sasprosko590/SASPClean/releases/latest`,
+          headers: headers,
+        },
+        (response) => {
+          let data = "";
+
+          response.on("data", (chunk) => {
+            data += chunk;
+          });
+
+          response.on("end", () => {
+            try {
+              if (
+                response.statusCode !== 200 ||
+                !response.headers["content-type"].includes("application/json")
+              ) {
+                throw new Error(
+                  `Invalid response. Status code: ${response.statusCode}`
+                );
+              }
+
+              const parsedData = JSON.parse(data);
+              const latestVersion = parsedData.tag_name;
+              console.log("Latest version:", latestVersion);
+
+              if (latestVersion !== currentVersion) {
+                console.log("The project is out of date.");
+              } else {
+                console.log("The project is up to date.");
+              }
+            } catch (error) {
+              console.error("GitHub API Error:", error.message);
+            }
+          });
+        }
+      )
+      .on("error", (error) => {
+        console.error("HTTP GET error:", error.message);
+      });
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+checkLatestVersion("V0.0.4");
 
 /**
  * Executes a command and returns the result.
@@ -40,7 +111,7 @@ async function execCommand(command, options = {}) {
  *
  * @returns {Promise<string[]>} - A promise that resolves with an array of default folders.
  */
-async function defaultFolders() {
+async function getDefaultFolders() {
   try {
     const username = await getUsername();
     if (username) {
@@ -68,7 +139,9 @@ async function defaultFolders() {
  */
 async function getUsername() {
   try {
-    const result = await execCommand("echo %username%");
+    const result =
+      (await execCommand("echo %username%")) ||
+      "Error: Failed to retrieve username.";
     const username = result.stdout.toString().trim();
     if (username) {
       console.log("Username retrieved successfully:", username);
@@ -89,14 +162,14 @@ async function getUsername() {
  * @param {string} folderPath - The path of the folder.
  * @returns {Promise<boolean>} - A promise that resolves with true if the folder exists, false otherwise.
  */
-const FolderExists = async (folderPath) => {
+async function FolderExists(folderPath) {
   try {
     await fs.promises.access(folderPath, fs.constants.F_OK);
     return true;
   } catch (error) {
     return false;
   }
-};
+}
 
 /**
  * Lists files in a given folder.
@@ -104,7 +177,7 @@ const FolderExists = async (folderPath) => {
  * @param {string} folderPath - The path of the folder.
  * @returns {Promise<string[]>} - A promise that resolves with files in the folder.
  */
-const listFilesInFolder = async (folderPath) => {
+async function listFilesInFolder(folderPath) {
   try {
     // Check if the folder exists
     const folderExists = await FolderExists(folderPath);
@@ -125,30 +198,30 @@ const listFilesInFolder = async (folderPath) => {
     console.error(`Error listing files in ${folderPath}:`, error.message);
     return [];
   }
-};
+}
 
 /**
- * Deletes files in a given folder.
+ * Deletes a file asynchronously.
  *
  * @param {string} filePath - The path of the file.
  * @returns {Promise<void>} - A promise that resolves after the file is deleted.
  */
-const deleteFile = async (filePath) => {
+async function deleteFile(filePath) {
   try {
     console.log(`Deleting file: ${filePath}`);
-    // Check for files
-    const fileExists = await FolderExists(filePath);
+    // Check if the file exists
+    const fileExists = await folderExists(filePath);
     if (!fileExists) {
-      console.log(`File does not exist: ${filePath}`);
+      console.log(`File not found: ${filePath}`);
       return;
     }
-    // Delete file
+    // Delete the file
     await fs.promises.unlink(filePath);
     console.log(`File deleted successfully: ${filePath}`);
   } catch (error) {
     console.error(`Error deleting file asynchronously: ${error.message}`);
     try {
-      // Try to delete synchronously too
+      // Try to delete synchronously as well
       console.log(`Attempting to delete file synchronously: ${filePath}`);
       fs.unlinkSync(filePath);
       console.log(`File deleted successfully (synchronously): ${filePath}`);
@@ -156,7 +229,7 @@ const deleteFile = async (filePath) => {
       console.error(`Error deleting file synchronously: ${syncError.message}`);
     }
   }
-};
+}
 
 /**
  * Opens a tool using the specified command.
@@ -164,14 +237,14 @@ const deleteFile = async (filePath) => {
  * @param {string} toolCommand - The command to open the tool.
  * @param {string} toolDisplayName - The display name of the tool for logging purposes.
  */
-const openTool = async (toolCommand, toolDisplayName) => {
+async function openTool(toolCommand, toolDisplayName) {
   try {
     await execCommand(toolCommand);
     console.log(`${toolDisplayName} opened successfully.`);
   } catch (error) {
     console.error(`Error opening ${toolDisplayName}:`, error.message);
   }
-};
+}
 
 /**
  * Clears specified folders, opens selected tools, and performs additional cleanup actions.
@@ -193,7 +266,9 @@ const openTool = async (toolCommand, toolDisplayName) => {
  * @param {boolean} [options.openMDT=false] - Whether to open the Memory Diagnostic Tool (MDT).
  * @param {boolean} [options.openMRT=false] - Whether to open the Malicious Software Removal Tool (MRT).
  * @param {boolean} [options.openSFC=false] - Whether to run the System File Checker (SFC) tool.
- * @param {boolean} [options.updateCheckWindowsUpdate= false] - Whether Windows update will check for updates.
+ * @param {boolean} [options.openWF=false] - Whether to open the Winsat Formal (WF) tool.
+ * @param {boolean} [options.openWingetUpgrade=false] - Whether to open the wingetUpgrade tool
+ * @param {boolean} [options.updateCheckWindowsUpdate=false] - Whether Windows update will check for updates.
  */
 async function clear({
   clearSpotifyData = false,
@@ -212,10 +287,12 @@ async function clear({
   openMDT = false,
   openMRT = false,
   openSFC = false,
+  openWF = false,
+  openWingetUpgrade = false,
   updateCheckWindowsUpdate = false,
 } = {}) {
   // Retrieve default folders
-  let folders = await defaultFolders();
+  let folders = await getDefaultFolders();
 
   // Optionally add additional folders based on user's choices
   if (clearWindowsOld) {
@@ -320,7 +397,17 @@ async function clear({
     if (openSFC)
       await openTool(
         "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'sfc /scannow' -Wait }\"",
-        "'sfc /scannow'"
+        "Scan"
+      );
+    if (openWF)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winsat formal' -Wait }\"",
+        "winsat formal"
+      );
+    if (openWingetUpgrade)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winget upgrade -all' -Wait }\"",
+        "Upgrade winget"
       );
     if (updateCheckWindowsUpdate)
       await openTool(
