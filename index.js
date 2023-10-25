@@ -210,7 +210,7 @@ async function deleteFile(filePath) {
   try {
     console.log(`Deleting file: ${filePath}`);
     // Check if the file exists
-    const fileExists = await folderExists(filePath);
+    const fileExists = await FolderExists(filePath);
     if (!fileExists) {
       console.log(`File not found: ${filePath}`);
       return;
