@@ -4,7 +4,7 @@
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.4
+- **Version:** 0.0.5
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
@@ -30,4 +30,4 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 ## Usage 🚀
 
 - Type 'npm i' in the terminal and install the modules
-- You can also run it easily with `start_cleanup.bat` but restart the PC after you have done all that.
+- You can also run it easily with `start_clean.bat` but restart the PC after you have done all that.

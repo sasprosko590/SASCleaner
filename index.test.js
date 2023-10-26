@@ -12,6 +12,7 @@ async function runExample() {
       openCDR: true,
       openCDX: true,
       openDiskCleaner: true,
+      openDiskCleanerSageRun: true,
       openDismAddPackages: true,
       openDismCheckHealth: true,
       openDismGetPackages: true,

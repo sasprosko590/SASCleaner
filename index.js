@@ -1,7 +1,7 @@
 /**
  * @author Sasprosko
  * @description I coded it to bring the computer back to fast performance, pure, tidy, like when you first bought it. I have absolutely no bad intentions and there is no bad software in the code.
- * @version 0.0.4
+ * @version 0.0.5
  * @copyright (c) 2023 Sasprosko/Umut
  * @license MIT
  * @file LICENSE
@@ -25,7 +25,6 @@ async function RandomUserAgent() {
 async function checkLatestVersion(currentVersion) {
   try {
     //const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
-
     const headers = {
       "User-Agent": await RandomUserAgent(),
     };
@@ -78,7 +77,7 @@ async function checkLatestVersion(currentVersion) {
   }
 }
 
-checkLatestVersion("V0.0.4");
+checkLatestVersion("V0.0.5");
 
 /**
  * Executes a command and returns the result.
@@ -191,7 +190,6 @@ async function listFilesInFolder(folderPath) {
 
     console.log(`\nFiles in ${folderPath}:`);
     const files = await fs.promises.readdir(folderPath);
-    files.forEach((file) => console.log(file));
 
     return files;
   } catch (error) {
@@ -239,7 +237,11 @@ async function deleteFile(filePath) {
  */
 async function openTool(toolCommand, toolDisplayName) {
   try {
-    await execCommand(toolCommand);
+    const terminalCommand =
+      process.platform === "win32"
+        ? `start cmd /c ${toolCommand}`
+        : toolCommand;
+    await execCommand(terminalCommand);
     console.log(`${toolDisplayName} opened successfully.`);
   } catch (error) {
     console.error(`Error opening ${toolDisplayName}:`, error.message);
@@ -257,6 +259,7 @@ async function openTool(toolCommand, toolDisplayName) {
  * @param {boolean} [options.openCDR=false] - Whether to open the Change Directory Recursive (CDR) tool.
  * @param {boolean} [options.openCDX=false] - Whether to open the Change Directory Extended (CDX) tool.
  * @param {boolean} [options.openDiskCleaner=false] - Whether to open the Disk Cleaner tool.
+ * @param {boolean} [options.openDiskCleanerSageRun=false] - Whether to perform the specified Disk Cleanup configuration.
  * @param {boolean} [options.openDismAddPackages=false] - Whether to run DISM to add a package.
  * @param {boolean} [options.openDismCheckHealth=false] - Whether to run DISM for health checking.
  * @param {boolean} [options.openDismGetPackages=false] - Whether to run DISM to get a list of installed packages.
@@ -278,6 +281,7 @@ async function clear({
   openCDR = false,
   openCDX = false,
   openDiskCleaner = false,
+  openDiskCleanerSageRun = false,
   openDismAddPackages = false,
   openDismCheckHealth = false,
   openDismGetPackages = false,
@@ -387,6 +391,11 @@ async function clear({
         "DISM Restore Health"
       );
     if (openDiskCleaner) await openTool("cleanmgr.exe", "Disk Cleaner");
+    if (openDiskCleanerSageRun)
+      await openTool(
+        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'cleanmgr /sagerun:1' -Wait }\"",
+        "Disk Cleaner Sagerun"
+      );
     if (openMDT)
       await openTool(
         "powershell -Command \"Start-Process 'mdsched.exe' -Verb RunAs -Wait\"",
