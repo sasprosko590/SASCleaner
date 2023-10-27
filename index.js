@@ -12,6 +12,11 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const UserAgent = require("user-agents");
 
+if (Number(process.versions.node.split(".")[0]) < 10)
+  throw new Error(
+    `Your node version ${process.version} is too old, please update it. https://nodejs.org/en`
+  );
+
 async function RandomUserAgent() {
   const userAgent = new UserAgent();
   return userAgent.toString();
@@ -19,10 +24,8 @@ async function RandomUserAgent() {
 
 /**
  * Checks the latest version of a GitHub repository.
- *
- * @param {string} currentVersion - The current version of the project.
  */
-async function checkLatestVersion(currentVersion) {
+async function checkLatestVersion() {
   try {
     //const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
     const headers = {
@@ -57,8 +60,8 @@ async function checkLatestVersion(currentVersion) {
               const parsedData = JSON.parse(data);
               const latestVersion = parsedData.tag_name;
               console.log("Latest version:", latestVersion);
-
-              if (latestVersion !== currentVersion) {
+              const str = String("\u0056\u0030\u002e\u0030\u002e\u0035");
+              if (latestVersion !== str) {
                 console.log("The project is out of date.");
               } else {
                 console.log("The project is up to date.");
@@ -76,8 +79,6 @@ async function checkLatestVersion(currentVersion) {
     console.error("Error:", error.message);
   }
 }
-
-checkLatestVersion("V0.0.5");
 
 /**
  * Executes a command and returns the result.
@@ -207,25 +208,20 @@ async function listFilesInFolder(folderPath) {
 async function deleteFile(filePath) {
   try {
     console.log(`Deleting file: ${filePath}`);
-    // Check if the file exists
+
     const fileExists = await FolderExists(filePath);
+
     if (!fileExists) {
       console.log(`File not found: ${filePath}`);
       return;
     }
-    // Delete the file
-    await fs.promises.unlink(filePath);
+
+    fs.unlink(filePath);
     console.log(`File deleted successfully: ${filePath}`);
   } catch (error) {
     console.error(`Error deleting file asynchronously: ${error.message}`);
-    try {
-      // Try to delete synchronously as well
-      console.log(`Attempting to delete file synchronously: ${filePath}`);
-      fs.unlinkSync(filePath);
-      console.log(`File deleted successfully (synchronously): ${filePath}`);
-    } catch (syncError) {
-      console.error(`Error deleting file synchronously: ${syncError.message}`);
-    }
+    
+    return;
   }
 }
 
@@ -294,6 +290,7 @@ async function clear({
   openWingetUpgrade = false,
   updateCheckWindowsUpdate = false,
 } = {}) {
+  checkLatestVersion();
   // Retrieve default folders
   let folders = await getDefaultFolders();
 
