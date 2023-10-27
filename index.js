@@ -216,11 +216,11 @@ async function deleteFile(filePath) {
       return;
     }
 
-    fs.unlink(filePath);
+    await fs.promises.unlink(filePath);
     console.log(`File deleted successfully: ${filePath}`);
   } catch (error) {
     console.error(`Error deleting file asynchronously: ${error.message}`);
-    
+
     return;
   }
 }
