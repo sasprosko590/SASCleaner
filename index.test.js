@@ -25,9 +25,8 @@ async function runExample() {
       openWingetUpgrade: true,
       updateCheckWindowsUpdate: true,
     };
-
-    await cleaner.clear(options);
-
+    
+    cleaner.clear(options);
     console.log("SASPClean completed successfully!");
   } catch (error) {
     console.error("Error during SASPClean:", error.message);

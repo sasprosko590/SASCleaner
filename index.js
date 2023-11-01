@@ -1,7 +1,7 @@
 /**
  * @author Sasprosko
  * @description I coded it to bring the computer back to fast performance, pure, tidy, like when you first bought it. I have absolutely no bad intentions and there is no bad software in the code.
- * @version 0.0.5
+ * @version 0.0.6
  * @copyright (c) 2023 Sasprosko/Umut
  * @license MIT
  * @file LICENSE
@@ -12,10 +12,10 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const UserAgent = require("user-agents");
 
-if (Number(process.versions.node.split(".")[0]) < 10)
-  throw new Error(
-    `Your node version ${process.version} is too old, please update it. https://nodejs.org/en`
-  );
+const nodeVersion = Number(process.versions.node.split(".")[0]);
+if (nodeVersion < 10) {
+  throw new Error(`Your Node.js version ${process.version} is too old. Please update it: https://nodejs.org/en`);
+}
 
 async function RandomUserAgent() {
   const userAgent = new UserAgent();
@@ -27,54 +27,42 @@ async function RandomUserAgent() {
  */
 async function checkLatestVersion() {
   try {
-    //const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
     const headers = {
       "User-Agent": await RandomUserAgent(),
     };
 
-    https
-      .get(
-        {
-          hostname: "api.github.com",
-          path: `/repos/sasprosko590/SASPClean/releases/latest`,
-          headers: headers,
-        },
-        (response) => {
-          let data = "";
+    https.get({ hostname: "api.github.com", path: "/repos/sasprosko590/SASPClean/releases/latest", headers }, (response) => {
+      let data = "";
 
-          response.on("data", (chunk) => {
-            data += chunk;
-          });
-
-          response.on("end", () => {
-            try {
-              if (
-                response.statusCode !== 200 ||
-                !response.headers["content-type"].includes("application/json")
-              ) {
-                throw new Error(
-                  `Invalid response. Status code: ${response.statusCode}`
-                );
-              }
-
-              const parsedData = JSON.parse(data);
-              const latestVersion = parsedData.tag_name;
-              console.log("Latest version:", latestVersion);
-              const str = String("\u0056\u0030\u002e\u0030\u002e\u0035");
-              if (latestVersion !== str) {
-                console.log("The project is out of date.");
-              } else {
-                console.log("The project is up to date.");
-              }
-            } catch (error) {
-              console.error("GitHub API Error:", error.message);
-            }
-          });
-        }
-      )
-      .on("error", (error) => {
-        console.error("HTTP GET error:", error.message);
+      response.on("data", (chunk) => {
+        data += chunk;
       });
+
+      response.on("end", () => {
+        try {
+          if (response.statusCode !== 200 || !response.headers["content-type"].includes("application/json")) {
+            throw new Error(`Invalid response. Status code: ${response.statusCode}`);
+          }
+
+          const parsedData = JSON.parse(data);
+          const latestVersion = parsedData.tag_name;
+          console.log("Latest version:", latestVersion);
+          const str = String("\u0056\u0030\u002e\u0030\u002e\u0036");
+          
+          if (latestVersion !== str) {
+            console.log("The project is out of date.");
+            console.log("https://github.com/sasprosko590/SASPClean")
+          } else {
+            console.log("The project is up to date.");
+          }
+        } catch (error) {
+          console.error("GitHub API Error:", error.message);
+        }
+      });
+    })
+    .on("error", (error) => {
+      console.error("HTTP GET error:", error.message);
+    });
   } catch (error) {
     console.error("Error:", error.message);
   }
@@ -89,7 +77,7 @@ async function checkLatestVersion() {
  */
 async function execCommand(command, options = {}) {
   try {
-    const result = await new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       exec(command, { ...options, cwd: __dirname }, (error, stdout, stderr) => {
         if (error) {
           reject(error);
@@ -98,8 +86,6 @@ async function execCommand(command, options = {}) {
         }
       });
     });
-
-    return result;
   } catch (error) {
     console.error("Command error:", error.message);
     throw error;
@@ -139,19 +125,28 @@ async function getDefaultFolders() {
  */
 async function getUsername() {
   try {
-    const result =
-      (await execCommand("echo %username%")) ||
-      "Error: Failed to retrieve username.";
-    const username = result.stdout.toString().trim();
-    if (username) {
-      console.log("Username retrieved successfully:", username);
-      return username;
+    const whoamiResult = await execCommand("whoami");
+    let username, extractedPart;
+
+    if (whoamiResult && whoamiResult.stdout) {
+      username = whoamiResult.stdout.toString().trim();
     } else {
-      console.error("Error: Username is empty.");
-      return null;
+      const echoResult = await execCommand("echo %username%");
+
+      if (echoResult && echoResult.stdout) {
+        username = echoResult.stdout.toString().trim();
+      } else {
+        console.error("Error: The echo command to get the username failed.");
+        return null;
+      }
     }
+
+    const index = username.indexOf("\\");
+    extractedPart = index !== -1 ? username.substring(index + 1) : username;
+    //console.log("Username:", extractedPart);
+    return extractedPart;
   } catch (error) {
-    console.error("Error getting username:", error.message);
+    console.error("Error retrieving username:", error.message);
     return null;
   }
 }
@@ -179,20 +174,15 @@ async function FolderExists(folderPath) {
  */
 async function listFilesInFolder(folderPath) {
   try {
-    // Check if the folder exists
     const folderExists = await FolderExists(folderPath);
     if (!folderExists) {
       console.log(`Folder does not exist: ${folderPath}`);
       return [];
     }
 
-    const stats = await fs.promises.stat(folderPath);
-    if (!stats.isDirectory()) return [];
-
-    console.log(`\nFiles in ${folderPath}:`);
     const files = await fs.promises.readdir(folderPath);
-
-    return files;
+    console.log(`\nFiles in ${folderPath}:`);
+    return files.map(file => `${folderPath}\\${file}`);
   } catch (error) {
     console.error(`Error listing files in ${folderPath}:`, error.message);
     return [];
@@ -207,21 +197,16 @@ async function listFilesInFolder(folderPath) {
  */
 async function deleteFile(filePath) {
   try {
-    console.log(`Deleting file: ${filePath}`);
-
     const fileExists = await FolderExists(filePath);
-
-    if (!fileExists) {
-      console.log(`File not found: ${filePath}`);
-      return;
+    if (fileExists) {
+      console.log(`Deleting file: ${filePath}`);
+      await fs.promises.unlink(filePath);
+      console.log(`File deleted successfully: ${filePath}`);
+    } else {
+      console.log(`File does not exist: ${filePath}`);
     }
-
-    await fs.promises.unlink(filePath);
-    console.log(`File deleted successfully: ${filePath}`);
   } catch (error) {
     console.error(`Error deleting file asynchronously: ${error.message}`);
-
-    return;
   }
 }
 
@@ -233,12 +218,18 @@ async function deleteFile(filePath) {
  */
 async function openTool(toolCommand, toolDisplayName) {
   try {
-    const terminalCommand =
-      process.platform === "win32"
-        ? `start cmd /c ${toolCommand}`
-        : toolCommand;
-    await execCommand(terminalCommand);
-    console.log(`${toolDisplayName} opened successfully.`);
+    const terminalCommand = process.platform === "win32" ? `start cmd /c ${toolCommand}` : toolCommand;
+    await new Promise((resolve, reject) => {
+      execCommand(terminalCommand)
+        .then(() => {
+          console.log(`${toolDisplayName} opened successfully.`);
+          resolve();
+        })
+        .catch(error => {
+          console.error(`Error opening ${toolDisplayName}:`, error.message);
+          reject(error);
+        });
+    });
   } catch (error) {
     console.error(`Error opening ${toolDisplayName}:`, error.message);
   }
@@ -291,10 +282,8 @@ async function clear({
   updateCheckWindowsUpdate = false,
 } = {}) {
   checkLatestVersion();
-  // Retrieve default folders
-  let folders = await getDefaultFolders();
+  const folders = await getDefaultFolders();
 
-  // Optionally add additional folders based on user's choices
   if (clearWindowsOld) {
     folders.push("c:\\windows.old");
   }
@@ -304,126 +293,39 @@ async function clear({
 
   if (clearSpotifyData) {
     try {
-      if (clearSpotifyData) {
-        let filePath = `${__dirname}/SpotifyInfo.txt`;
-        let fileContent =
-          "\u0059\u006f\u0075\u0020\u0063\u0061\u006e\u0020\u0065\u006e\u0074\u0065\u0072\u0020\u0074\u0068\u0065\u0020\u0053\u0070\u006f\u0074\u0069\u0066\u0079\u0020\u0061\u0070\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u006f\u006e\u002c\u0020\u0067\u006f\u0020\u0074\u006f\u0020\u0074\u0068\u0065\u0020\u0022\u0053\u0065\u0074\u0074\u0069\u006e\u0067\u0073\u0022\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u0020\u0061\u006e\u0064\u0020\u0063\u006c\u0065\u0061\u0072\u0020\u0069\u0074\u0020\u0066\u0072\u006f\u006d\u0020\u0074\u0068\u0065\u0020\u0022\u0043\u006c\u0065\u0061\u0072\u0020\u0043\u0061\u0063\u0068\u0065\u0022\u0020\u006f\u0070\u0074\u0069\u006f\u006e\u002c\u0020\u0079\u006f\u0075\u0020\u0063\u0061\u006e\u0020\u0061\u006c\u0073\u006f\u0020\u0064\u0065\u006c\u0065\u0074\u0065\u0020\u0022\u0044\u006f\u0077\u006e\u006c\u006f\u0061\u0064\u0073\u0022\u0020\u0066\u0072\u006f\u006d\u0020\u0074\u0068\u0065\u0020\u0073\u0061\u006d\u0065\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u002e";
+      const filePath = `${__dirname}/SpotifyInfo.txt`;
+      const fileContent =
+        "\u0059\u006f\u0075\u0020\u0063\u0061\u006e\u0020\u0065\u006e\u0074\u0065\u0072\u0020\u0074\u0068\u0065\u0020\u0053\u0070\u006f\u0074\u0069\u0066\u0079\u0020\u0061\u0070\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u006f\u006e\u002c\u0020\u0067\u006f\u0020\u0074\u006f\u0020\u0074\u0068\u0065\u0020\u0022\u0053\u0065\u0074\u0074\u0069\u006e\u0067\u0073\u0022\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u0020\u0061\u006e\u0064\u0020\u0063\u006c\u0065\u0061\u0072\u0020\u0069\u0074\u0020\u0066\u0072\u006f\u006d\u0020\u0074\u0068\u0065\u0020\u0022\u0043\u006c\u0065\u0061\u0072\u0020\u0043\u0061\u0063\u0068\u0065\u0022\u0020\u006f\u0070\u0074\u0069\u006f\u006e\u002c\u0020\u0079\u006f\u0075\u0020\u0063\u0061\u006e\u0020\u0061\u006c\u0073\u006f\u0020\u0064\u0065\u006c\u0065\u0074\u0065\u0020\u0022\u0044\u006f\u0077\u006e\u006c\u006f\u0061\u0064\u0073\u0022\u0020\u0066\u0072\u006f\u006d\u0020\u0074\u0068\u0065\u0020\u0073\u0061\u006d\u0065\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u002e";
 
-        fs.stat(filePath, (err, stats) => {
-          if (err) {
-            if (err.code === "ENOENT") {
-              // If the file does not exist, create it and write the content
-              fs.writeFile(filePath, fileContent, "utf8", (writeErr) => {
-                if (writeErr) {
-                  console.error("File creation and writing error:", writeErr);
-                } else {
-                  console.log(`File created and content written: ${filePath}`);
-                }
-              });
-            } else {
-              console.error("File status check error:", err);
-            }
-          } else {
-            // If the file already exists, update the content
-            fs.writeFile(filePath, fileContent, "utf8", (writeErr) => {
-              if (writeErr) {
-                console.error("File content update error:", writeErr);
-              } else {
-                console.log(`Updated file content: ${filePath}`);
-              }
-            });
-          }
-        });
-      }
+      fs.promises.writeFile(filePath, fileContent, "utf8");
+      console.log(`File created and content written: ${filePath}`);
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
   }
 
-  // Open selected tools
   try {
-    if (clearWindowsUpdate)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /startcomponentcleanup' -Wait }\"",
-        "Windows Update"
-      );
-    if (openCDF)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /f' -Wait }\"",
-        "Check Disk"
-      );
-    if (openCDR)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /r' -Wait }\"",
-        "Check Disk"
-      );
-    if (openCDX)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /x' -Wait }\"",
-        "Check Disk"
-      );
-    if (openDismAddPackages)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /add-package /packagepath:C:\\path\\to\\update.cab' -Wait }\"",
-        "DISM Add Packages"
-      );
-    if (openDismCheckHealth)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /checkhealth' -Wait }\"",
-        "DISM Check Health"
-      );
-    if (openDismGetPackages)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /get-packages' -Wait }\"",
-        "DISM Get Packages"
-      );
-    if (openDismRepair)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\repairsource\\install.wim' -Wait }\"",
-        "DISM Repair"
-      );
-    if (openDismRestoreHealth)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth' -Wait }\"",
-        "DISM Restore Health"
-      );
+    if (clearWindowsUpdate) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /startcomponentcleanup' -Wait }\"", "Windows Update");
+    if (openCDF) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /f' -Wait }\"", "Check Disk");
+    if (openCDR) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /r' -Wait }\"", "Check Disk");
+    if (openCDX) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /x' -Wait }\"", "Check Disk");
+    if (openDismAddPackages) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /add-package /packagepath:C:\\path\\to\\update.cab' -Wait }\"", "DISM Add Packages");
+    if (openDismCheckHealth) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /checkhealth' -Wait }\"", "DISM Check Health");
+    if (openDismGetPackages) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /get-packages' -Wait }\"", "DISM Get Packages");
+    if (openDismRepair) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\source /limitaccess' -Wait }\"", "DISM Repair"), await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\repairsource\\install.wim' -Wait }\"", "DISM Repair 2");
+    if (openDismRestoreHealth) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth' -Wait }\"", "DISM Restore Health");
     if (openDiskCleaner) await openTool("cleanmgr.exe", "Disk Cleaner");
-    if (openDiskCleanerSageRun)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'cleanmgr /sagerun:1' -Wait }\"",
-        "Disk Cleaner Sagerun"
-      );
-    if (openMDT)
-      await openTool(
-        "powershell -Command \"Start-Process 'mdsched.exe' -Verb RunAs -Wait\"",
-        "MDT"
-      );
+    if (openDiskCleanerSageRun) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'cleanmgr /sagerun:1' -Wait }\"", "Disk Cleaner Sagerun");
+    if (openMDT) await openTool("powershell -Command \"Start-Process 'mdsched.exe' -Verb RunAs -Wait\"", "MDT");
     if (openMRT) await openTool("mrt.exe", "MRT");
-    if (openSFC)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'sfc /scannow' -Wait }\"",
-        "Scan"
-      );
-    if (openWF)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winsat formal' -Wait }\"",
-        "winsat formal"
-      );
-    if (openWingetUpgrade)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winget upgrade -all' -Wait }\"",
-        "Upgrade winget"
-      );
-    if (updateCheckWindowsUpdate)
-      await openTool(
-        "powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'wuauclt.exe /detectnow' -Wait }\"",
-        "Check Win Update"
-      );
+    if (openSFC) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'sfc /scannow' -Wait }\"", "Scan");
+    if (openWF) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winsat formal' -Wait }\"", "winsat formal");
+    if (openWingetUpgrade) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winget upgrade -all' -Wait }\"", "Upgrade winget");
+    if (updateCheckWindowsUpdate) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'wuauclt.exe /detectnow' -Wait }\"", "Check Win Update");
   } catch (error) {
     console.error("Error while opening tools:", error.message);
   }
 
-  // Retrieve files in default folders and delete them
   for (const folder of folders) {
     try {
       const files = await listFilesInFolder(folder);
@@ -432,6 +334,7 @@ async function clear({
         for (const file of files) {
           const filePath = `${folder}\\${file}`;
           await deleteFile(filePath);
+          console.log(`File deleted successfully: ${filePath}`);
         }
       } else {
         console.log(`No files to delete in ${folder}.`);
@@ -442,6 +345,4 @@ async function clear({
   }
 }
 
-module.exports = {
-  clear,
-};
+module.exports = { clear, };

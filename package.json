@@ -1,6 +1,6 @@
 {
   "name": "saspclean",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "This script was created to restore the computer to the fast, pure and regular performance as it was when it was first purchased.",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,5 @@
     "axios": "^1.5.1",
     "node-fetch": "^3.3.2",
     "user-agents": "^1.1.3"
-  },
-  "devDependencies": {}
+  }
 }
