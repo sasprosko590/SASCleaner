@@ -29,4 +29,4 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 ## Usage 🚀
 
-- You can also run it easily with `start.bat` but restart the PC after you have done all that.
+- You can also run it easily with `start.bat` answer the questions properly and restart the computer after you have done all this.
