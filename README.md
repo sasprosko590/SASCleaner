@@ -1,10 +1,10 @@
-# SASPClean Script 🚀
+# SASPClean 🚀
 
 ## Overview 🌐
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.6
+- **Version:** 0.0.7
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
@@ -29,5 +29,4 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 ## Usage 🚀
 
-- Type 'npm i' in the terminal and install the modules
-- You can also run it easily with `start_clean.bat` but restart the PC after you have done all that.
+- You can also run it easily with `start.bat` but restart the PC after you have done all that.
