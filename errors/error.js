@@ -51,7 +51,7 @@ async function logError(...messages) {
   }
 
   try {
-    await fs.promises.writeFile(logFileName, errorMessage);
+    await fs.promises.appendFile(logFileName, errorMessage);
   } catch (err) {
     console.error("Error writing to error.log:", err);
   }
