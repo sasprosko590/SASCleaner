@@ -4,13 +4,12 @@
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.7
+- **Version:** 0.0.8
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
 ### Notes
 
-- I recommend to always set "Dism" to "true",
 - I don't have any bad intentions, there is no bad software in the code, and there is no such thing as taking the user's name in the code.
 - Update your drivers.
 - Close unnecessary startup programs in the task manager.
@@ -29,4 +28,4 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 ## Usage 🚀
 
-- You can also run it easily with `start.bat` answer the questions properly and restart the computer after you have done all this.
+- You can also run it easily with `start.bat` but restart the PC after you have done all that.
