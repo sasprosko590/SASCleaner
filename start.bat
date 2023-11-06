@@ -65,7 +65,7 @@ set "soru[16]=Windows Deneyim Endeksi Formel Degerlendirme - Bu komut, Windows D
 set "komut[16]=winsat formal"
 
 set "soru[17]=Winget Guncelleme - Bu komut, Windows Paket Yoneticisi (Winget) kullanarak yuklu tum uygulamalari gunceller."
-set "komut[17]=winget upgrade -all"
+set "komut[17]=winget upgrade --all"
 
 set "soru[18]=Windows Guncelleme Kontrolu - Bu komut, Windows guncellemelerini kontrol eder."
 set "komut[18]=wuauclt.exe /detectnow"
@@ -136,7 +136,6 @@ call powershell -Command "& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/
 exit /b
 
 :english
-
 REM Defining questions and commands
 set "question[1]=Clear Windows Update - This command is used to clean up junk files and the component store on Windows."
 set "command[1]=dism /online /cleanup-image /startcomponentcleanup"
@@ -187,7 +186,7 @@ set "question[16]=Windows Experience Index Formal Assessment - This command runs
 set "command[16]=winsat formal"
 
 set "question[17]=Upgrade winget - This command upgrades all installed apps using Windows Package Manager (Winget)."
-set "command[17]=winget upgrade -all"
+set "command[17]=winget upgrade --all"
 
 set "question[18]=Check Win Update - This command checks for Windows updates immediately."
 set "command[18]=wuauclt.exe /detectnow"
@@ -258,7 +257,6 @@ call powershell -Command "& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/
 exit /b
 
 :german
-
 REM Definition von Fragen und Befehlen
 set "question[1]=Windows Update löschen - Dieser Befehl wird verwendet, um Junk-Dateien und den Komponentenspeicher unter Windows zu bereinigen."
 set "command[1]=dism /online /cleanup-image /startcomponentcleanup"
@@ -309,7 +307,7 @@ set "question[16]=Formale Bewertung des Windows Experience Index - Dieser Befehl
 set "command[16]=winsat formal"
 
 set "question[17]=Winget aktualisieren - Dieser Befehl aktualisiert alle installierten Apps mit dem Windows Package Manager (Winget)."
-set "command[17]=winget upgrade -all"
+set "command[17]=winget upgrade --all"
 
 set "question[18]=Windows Update überprüfen - Dieser Befehl überprüft sofort auf Windows-Updates."
 set "command[18]=wuauclt.exe /detectnow"
