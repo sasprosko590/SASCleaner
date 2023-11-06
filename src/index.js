@@ -1,11 +1,37 @@
-/*Version 0.0.7*/
-
 const https = require("https");
+const path = require("path");
 const fs = require("fs");
-const { exec } = require("child_process");
 const UserAgent = require("user-agents");
+const { promisify } = require('util');
+const execAsync = promisify(require('child_process').exec);
+const { exec } = require("child_process");
+const version = require('../package.json').version;
 const OptionsError = require("../errors/error.js").OptionsError;
 const logError = require("../errors/error.js").logError;
+
+/**
+ * Retrieves language data based on the user's locale.
+ *
+ * @param {string} property The property to retrieve from the language data.
+ * @returns {string} The value of the requested property in the user's language.
+ * @since 0.0.8
+ * @throws {Error} If there is an issue while getting or parsing the language data.
+ */
+const langData = (property) => {
+  try {
+    const userLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+    const lang = userLocale.split('-')[0].toLowerCase();
+
+    const langFilePath = path.join(__dirname, `../language/locales/${lang}.json`);
+    const fileContent = fs.readFileSync(langFilePath, 'utf8');
+    const langData = JSON.parse(fileContent);
+
+    return langData[property];
+  } catch (error) {
+    console.error('Error while getting locale:', error.message);
+    return 'Error occurred while getting locale data.';
+  }
+};
 
 /**
  * Node.js version check.
@@ -14,13 +40,10 @@ const logError = require("../errors/error.js").logError;
  * @throws {Error} Throws an error if the Node.js version is too old.
  */
 const nodeVersion = Number(process.versions.node.split(".")[0]);
-try {
-  if (nodeVersion < 10) {
-    throw new Error(`Your Node.js version \x1b[31m${process.version}\x1b[0m is too old. Please update it: https://nodejs.org/en`);
-  }
-} catch (error) {
-  logError(error);
+if (nodeVersion < 10) {
+  throw new Error(langData("NodeVersion"));
 }
+
 /**
  * Generates a random user agent string.
  *
@@ -44,7 +67,10 @@ async function checkLatestVersion() {
       "User-Agent": await RandomUserAgent(),
     };
 
-    https.get({ hostname: "api.github.com", path: "/repos/sasprosko590/SASPClean/releases/latest", headers }, (response) => {
+    const response = await new Promise((resolve, reject) => {
+      https.get({ hostname: "api.github.com", path: "/repos/sasprosko590/SASPClean/releases/latest", headers }, resolve)
+        .on("error", reject);
+    });
       let data = "";
 
       response.on("data", (chunk) => {
@@ -54,30 +80,27 @@ async function checkLatestVersion() {
       response.on("end", () => {
         try {
           if (response.statusCode !== 200 || !response.headers["content-type"].includes("application/json")) {
-            throw new Error(`Invalid response. Status code: ${response.statusCode}`);
+            logError(langData("InvalidStatusCode") + response.statusCode);
           }
 
           const parsedData = JSON.parse(data);
           const latestVersion = parsedData.tag_name;
-          console.log("Latest version:", latestVersion);
-          const str = String("\u0056\u0030\u002e\u0030\u002e\u0037");
-          
-          if (latestVersion !== str) {
-            console.log("The project is \x1b[31mout of date.\x1b[0m");
-            console.log("https://github.com/sasprosko590/SASPClean")
+
+          if (latestVersion !== "V" + version.toString()) {
+            console.log(langData("OutOfDate"));
+            console.log(String(langData("Version")).replace("${version}", version).replace("${latestVersion}", latestVersion))
+            console.log(langData("Links"))
+            console.log("https://github.com/sasprosko590/SASPClean");
+            console.log(parsedData.html_url);
           } else {
-            console.log("The project is \x1b[32mup to date.\x1b[0m");
+            console.log(langData("UptoDate"));
           }
         } catch (error) {
-          logError("GitHub API Error:", error);
+          logError(langData("GithubApiError"), error);
         }
       });
-    })
-    .on("error", (error) => {
-      logError("HTTP GET error:", error);
-    });
-  } catch (error) {
-    logError("Error:", error);
+    } catch (error) {
+    logError(langData("Error"), error);
   }
 }
 
@@ -92,18 +115,11 @@ async function checkLatestVersion() {
  */
 async function execCommand(command, options = {}) {
   try {
-    return await new Promise((resolve, reject) => {
-      exec(command, { ...options, cwd: __dirname }, (error, stdout, stderr) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve({ stdout, stderr });
-        }
-      });
-    });
+    const { stdout, stderr } = await execAsync(command, { ...options, cwd: __dirname });
+    return { stdout, stderr };
   } catch (error) {
-    logError("Command error:", error);
-    return;
+    logError(langData("CommandError"), error);
+    return { error };
   }
 }
 
@@ -125,12 +141,12 @@ async function getDefaultFolders() {
       ];
     } else {
       logError(
-        "Default folders cannot be initialized due to missing username."
+        langData("MissingUsername")
       );
       return [];
     }
   } catch (error) {
-    logError("Error while getting default folders:", error);
+    logError(langData("ErrorFolder"), error);
     return [];
   }
 }
@@ -144,27 +160,19 @@ async function getDefaultFolders() {
  */
 async function getUsername() {
   try {
-    const whoamiResult = await execCommand("whoami");
+    const whoamiResult = await execCommand("whoami") || await execCommand("echo %username%");
     let username, extractedPart;
 
     if (whoamiResult && whoamiResult.stdout) {
       username = whoamiResult.stdout.toString().trim();
+      const index = username.indexOf("\\");
+      extractedPart = index !== -1 ? username.substring(index + 1) : username;
+      return extractedPart;
     } else {
-      const echoResult = await execCommand("echo %username%");
-
-      if (echoResult && echoResult.stdout) {
-        username = echoResult.stdout.toString().trim();
-      } else {
-        logError("Error: The echo command to get the username failed.");
-        return null;
-      }
+      throw new Error(langData("ErrorUsername"));
     }
-
-    const index = username.indexOf("\\");
-    extractedPart = index !== -1 ? username.substring(index + 1) : username;
-    return extractedPart;
   } catch (error) {
-    logError("Error retrieving username:", error);
+    logError(langData("ErrorUsernameSimple"), error);
     return null;
   }
 }
@@ -198,15 +206,14 @@ async function listFilesInFolder(folderPath) {
   try {
     const folderExists = await FolderExists(folderPath);
     if (!folderExists) {
-      console.log(`Folder does not exist: \x1b[31m${folderPath}\x1b[0m`);
+      console.log(String(langData("FolderDoesNotExist")).replace("${folderPath}", folderPath))
       return [];
     }
 
     const files = await fs.promises.readdir(folderPath);
-    console.log(`\nFiles in ${folderPath}:`);
+    console.log(String(langData("FilesIn")).replace("${folderPath}", folderPath));
     return files.map(file => file);
   } catch (error) {
-    console.log(`Error listing files in \x1b[31m${folderPath}\x1b[0m:`, error);
     return [];
   }
 }
@@ -227,12 +234,12 @@ async function deleteFile(filePath) {
     if (fileExists) {
       await fs.promises.unlink(filePath);
       successfulDeletions++;
-      console.log(`File deleted successfully: \x1b[32m${filePath}\x1b[0m`);
+      console.log(String(langData("FilesDeletedSuccesfully")).replace("${filePath}", filePath));
     } else {
-      console.log(`File does not exist: \x1b[31m${filePath}\x1b[0m`);
+      console.log(String(langData("FileDoesNotExist").replace("${filePath}", filePath)));
     }
   } catch (error) {
-    logError(`Error deleting file asynchronously: ${error}`);
+    return;
   }
 }
 
@@ -250,16 +257,16 @@ async function openTool(toolCommand, toolDisplayName) {
     await new Promise((resolve, reject) => {
       execCommand(terminalCommand)
         .then(() => {
-          console.log(`\x1b[32m${toolDisplayName}\x1b[0m opened successfully.`);
+          console.log(String(langData("OpenedSuccessfully")).replace("${toolDisplayName}", toolDisplayName));
           resolve();
         })
         .catch(error => {
-          logError(`Error opening ${toolDisplayName}:`, error);
+          logError(String(langData("ErrorOpening")).replace("${toolDisplayName}", toolDisplayName), error);
           reject(error);
         });
     });
   } catch (error) {
-    logError(`Error opening ${toolDisplayName}:`, error);
+    logError(String(langData("ErrorOpening")).replace("${toolDisplayName}", toolDisplayName), error);
   }
 }
 
@@ -271,6 +278,7 @@ async function openTool(toolCommand, toolDisplayName) {
  * @param {boolean} [options.clearWindows10Upgrade=false] - Whether to clear the Windows10Upgrade folder.
  * @param {boolean} [options.clearWindowsOld=false] - Whether to clear the Windows.old folder.
  * @param {boolean} [options.clearWindowsUpdate=false] - Whether Windows Update will be cleaned.
+ * @param {boolean} [options.hackCheck] - Whether to check if you've been hacked
  * @param {boolean} [options.openCDF=false] - Whether to open the Change Directory Fast (CDF) tool.
  * @param {boolean} [options.openCDR=false] - Whether to open the Change Directory Recursive (CDR) tool.
  * @param {boolean} [options.openCDX=false] - Whether to open the Change Directory Extended (CDX) tool.
@@ -296,6 +304,7 @@ async function clear(options = {}) {
     clearWindows10Upgrade = false,
     clearWindowsOld = false,
     clearWindowsUpdate = false,
+    hackCheck = false,
     openCDF = false,
     openCDR = false,
     openCDX = false,
@@ -314,22 +323,13 @@ async function clear(options = {}) {
     updateCheckWindowsUpdate = false,
   } = options;
 
-  try {
   if (Object.keys(options).length > 20) {
-    throw new OptionsError("There are too many options. Maximum 20 options can be added.");
+    throw new OptionsError(langData("NodeVersion")).toString();
   }
-  } catch (error) {
-    if (error instanceof OptionsError) {
-      logError(error.message);
-    } else {
-      throw error;
-    }
-  }
-
-  try {
+  
+  checkLatestVersion();
   let totalFilesDeleted = 0;
 
-  checkLatestVersion();
   const folders = await getDefaultFolders();
 
   if (clearWindowsOld) {
@@ -342,17 +342,17 @@ async function clear(options = {}) {
   if (clearSpotifyData) {
     try {
       const filePath = `SpotifyInfo.txt`;
-      const fileContent =
-        "\u0059\u006f\u0075\u0020\u0063\u0061\u006e\u0020\u0065\u006e\u0074\u0065\u0072\u0020\u0074\u0068\u0065\u0020\u0053\u0070\u006f\u0074\u0069\u0066\u0079\u0020\u0061\u0070\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u006f\u006e\u002c\u0020\u0067\u006f\u0020\u0074\u006f\u0020\u0074\u0068\u0065\u0020\u0022\u0053\u0065\u0074\u0074\u0069\u006e\u0067\u0073\u0022\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u0020\u0061\u006e\u0064\u0020\u0063\u006c\u0065\u0061\u0072\u0020\u0069\u0074\u0020\u0066\u0072\u006f\u006d\u0020\u0074\u0068\u0065\u0020\u0022\u0043\u006c\u0065\u0061\u0072\u0020\u0043\u0061\u0063\u0068\u0065\u0022\u0020\u006f\u0070\u0074\u0069\u006f\u006e\u002c\u0020\u0079\u006f\u0075\u0020\u0063\u0061\u006e\u0020\u0061\u006c\u0073\u006f\u0020\u0064\u0065\u006c\u0065\u0074\u0065\u0020\u0022\u0044\u006f\u0077\u006e\u006c\u006f\u0061\u0064\u0073\u0022\u0020\u0066\u0072\u006f\u006d\u0020\u0074\u0068\u0065\u0020\u0073\u0061\u006d\u0065\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u002e";
+      const fileContent = langData("SpotifyInformation").toString();
       fs.promises.writeFile(filePath, fileContent, "utf8");
-      console.log(`File created and content written: \x1b[32m${filePath}\x1b[0m`);
+      console.log(String(langData("FileCreatedAndContentWritten")).replace("${filePath}", filePath));
     } catch (error) {
-      logError("An error occurred:", error);
+      logError(langData("AnErrorOccurred"), error);
     }
   }
 
   try {
     if (clearWindowsUpdate) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /startcomponentcleanup' -Wait }\"", "Windows Update");
+    if (hackCheck) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/k', 'quser' -Wait }\"", "Hack Check")
     if (openCDF) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /f' -Wait }\"", "Check Disk");
     if (openCDR) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /r' -Wait }\"", "Check Disk");
     if (openCDX) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /x' -Wait }\"", "Check Disk");
@@ -370,30 +370,28 @@ async function clear(options = {}) {
     if (openWingetUpgrade) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'winget upgrade -all' -Wait }\"", "Upgrade winget");
     if (updateCheckWindowsUpdate) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'wuauclt.exe /detectnow' -Wait }\"", "Check Win Update");
   } catch (error) {
-    logError("Error while opening tools:", error);
+    logError(langData("ErrorWhileOpeningTools"), error);
   }
 
-  for (const folder of folders) {
+  const folderPromises = folders.map(async (folder) => {
     try {
       const files = await listFilesInFolder(folder);
       if (files.length > 0) {
-        console.log(`Deleting files in ${folder}:`);
-        for (const file of files) {
-          const filePath = `${folder}\\${file}`;
+        console.log(String(langData("DeletingFilesInFolder")).replace("${folder}", folder));
+        await Promise.all(files.map(async (file) => {
+          const filePath = `${folder}/${file}`;
           await deleteFile(filePath);
           totalFilesDeleted++;
-        }
+        }));
       } else {
-        console.log(`There are no files in \x1b[31m${folder}\x1b[0m to delete.`);
+        console.log(String(langData("ThereAreNoFilesIn")).replace("${folder}", folder));
       }
     } catch (error) {
-      logError(`Error processing the ${folder} folder:`, error);
+      logError(String(langData("ErrorHandlingFolder")).replace("${folder}", folder), error);
     }
-  }
-  console.log(`${totalFilesDeleted > 0 ? '\x1b[32m' : '\x1b[31m'}${totalFilesDeleted}\x1b[0m files detected, ${successfulDeletions > 0 ? '\x1b[32m' : '\x1b[31m'}${successfulDeletions}\x1b[0m files deleted.`);
-  } catch (error) {
-    logError("Error during cleaning:", error);
-  }
-}
+  });
 
+  await Promise.all(folderPromises);
+  console.log(String(langData("InformationLog")).replace("${totalFilesDeleted}", totalFilesDeleted).replace("${successfulDeletions}", successfulDeletions));
+}
 module.exports = { clear };
