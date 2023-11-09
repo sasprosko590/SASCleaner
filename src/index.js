@@ -323,7 +323,7 @@ async function clear(options = {}) {
     updateCheckWindowsUpdate = false,
   } = options;
 
-  if (Object.keys(options).length > 20) {
+  if (Object.keys(options).length > 21) {
     throw new OptionsError(langData("NodeVersion")).toString();
   }
 
