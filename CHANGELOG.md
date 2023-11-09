@@ -1,5 +1,9 @@
 # CHANGELOG
 
+Version V1.0.0 = Added colored text (I don't know how to add it for cmd). Edited file deletion. Hacker control was added to index.test.js because it was forgotten to be added.
+
+Version V0.0.9 = Edited "winget upgrade --all" because it was misspelled and changed to "winget upgrade --all"
+
 Version V0.0.8 = start.bat has been updated, you will be able to use start.bat with peace of mind, there are language options in it, there are only (Turkish, English, German). it will be enough to give correct answers to the incoming questions. languages have been added to the code, you can use it with peace of mind (beta by the way.). optimizations have also been made for the code.
 
 Version V0.0.7 = added error/error.js (beta). more organized with project folders (I'm a bit new to this kind of thing, sorry). corrected and updated the information and code of the functions. Added code to show how many files are detected and how many files are deleted. Renamed "start_cleanup.bat" to "start.bat" and updated the code. Adjusted the code to appear in color in terminal or cmd.

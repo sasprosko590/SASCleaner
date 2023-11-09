@@ -4,7 +4,7 @@
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 0.0.8
+- **Version:** 1.0.0
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
@@ -17,7 +17,8 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 - Check for windows updates.
 - Clear your browsers' caches.
 - Restart the computer each time the code terminates.
-- Remember to set the power options to "High Performance" or "Ultimate Performance".,
+- Remember to set the power options to "High Performance" or "Ultimate Performance".
+- Open game mode.
 - If you press the Windows key from the keyboard and type "Adjust the appearance and performance of Windows" in the search field and click on it, if you click on "Adjust for best performance" in the window that appears in front of you "Performance Options" and press "Apply" and exit, your computer will get better performance, and my settings are as follows;
 
 - ✅ Custom:
