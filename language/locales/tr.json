@@ -24,7 +24,7 @@
   "DeletingFilesInFolder": "${folder} içindeki dosyaları silme",
   "ThereAreNoFilesIn": "${folder} içinde silinecek dosya yok.",
   "ErrorHandlingFolder": "Hata ${folder} klasörünü işliyor:",
-  "InformationLog": "${totalFilesDeleted} dosya tespit edildi, ${successfulDeletions} dosya silindi.",
+  "InformationLog": "${files} dosyadan: ${totalFilesDeleted} dosyaları algılandı, ${successfulDeletions} dosyaları silindi.",
   "SpotifyInformation": "Spotify uygulamasına girip \"Ayarlar\" bölümüne gidip \"Önbelleği Temizle\" seçeneğinden temizleyebilirsiniz, aynı bölümden \"İndirilenler\"i de silebilirsiniz",
   "Version": "Senin versiyonun: V${version} | En son versiyon: ${latestVersion}",
   "Links": "Linkler;"
