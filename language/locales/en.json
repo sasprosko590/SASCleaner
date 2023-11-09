@@ -24,7 +24,7 @@
   "DeletingFilesInFolder": "Deleting files in ${folder}:",
   "ThereAreNoFilesIn": "There are no files to delete in ${folder}",
   "ErrorHandlingFolder": "Error handling ${folder} folder:",
-  "InformationLog": "${totalFilesDeleted} files detected, ${successfulDeletions} files deleted.",
+  "InformationLog": "From file ${files}: ${totalFilesDeleted} files detected, ${successfulDeletions} files deleted.",
   "SpotifyInformation": "You can enter the Spotify application, go to the \"Settings\" section and clear it from the \"Clear Cache\" option, you can also delete \"Downloads\" from the same section.",
   "Version": "Your version: V${version} | Latest Version: ${latestVersion}",
   "Links": "Links;"
