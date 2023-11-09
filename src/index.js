@@ -4,7 +4,7 @@ const fs = require("fs");
 const UserAgent = require("user-agents");
 const { promisify } = require('util');
 const execAsync = promisify(require('child_process').exec);
-const { exec } = require("child_process");
+const util = require('util');
 const version = require('../package.json').version;
 const OptionsError = require("../errors/error.js").OptionsError;
 const logError = require("../errors/error.js").logError;
@@ -22,7 +22,7 @@ const langData = (property) => {
     const userLocale = Intl.DateTimeFormat().resolvedOptions().locale;
     const lang = userLocale.split('-')[0].toLowerCase();
 
-    const langFilePath = path.join(__dirname, `../language/locales/${lang}.json`);
+    const langFilePath = path.join(__dirname, `../language/locales/${lang || 'en'}.json`);
     const fileContent = fs.readFileSync(langFilePath, 'utf8');
     const langData = JSON.parse(fileContent);
 
@@ -32,6 +32,7 @@ const langData = (property) => {
     return 'Error occurred while getting locale data.';
   }
 };
+
 
 /**
  * Node.js version check.
@@ -88,7 +89,7 @@ async function checkLatestVersion() {
 
           if (latestVersion !== "V" + version.toString()) {
             console.log(langData("OutOfDate"));
-            console.log(String(langData("Version")).replace("${version}", version).replace("${latestVersion}", latestVersion))
+            console.log(String(langData("Version")).replace("${version}", `\u001b[1;31m${version}\u001b[1;0m`).replace("${latestVersion}", `\u001b[1;32m${folder}\u001b[1;0m`))
             console.log(langData("Links"))
             console.log("https://github.com/sasprosko590/SASPClean");
             console.log(parsedData.html_url);
@@ -206,12 +207,11 @@ async function listFilesInFolder(folderPath) {
   try {
     const folderExists = await FolderExists(folderPath);
     if (!folderExists) {
-      console.log(String(langData("FolderDoesNotExist")).replace("${folderPath}", folderPath))
+      console.log(String(langData("FolderDoesNotExist")).replace("${folderPath}", `\u001b[1;31m${folderPath}\u001b[1;0m`))
       return [];
     }
 
     const files = await fs.promises.readdir(folderPath);
-    console.log(String(langData("FilesIn")).replace("${folderPath}", folderPath));
     return files.map(file => file);
   } catch (error) {
     return [];
@@ -234,9 +234,9 @@ async function deleteFile(filePath) {
     if (fileExists) {
       await fs.promises.unlink(filePath);
       successfulDeletions++;
-      console.log(String(langData("FilesDeletedSuccesfully")).replace("${filePath}", filePath));
+      console.log(String(langData("FilesDeletedSuccesfully")).replace("${filePath}", `\u001b[1;32m${filePath}\u001b[1;0m`));
     } else {
-      console.log(String(langData("FileDoesNotExist").replace("${filePath}", filePath)));
+      console.log(String(langData("FileDoesNotExist").replace("${filePath}", `\u001b[1;31m${filePath}\u001b[1;0m`)));
     }
   } catch (error) {
     return;
@@ -257,7 +257,7 @@ async function openTool(toolCommand, toolDisplayName) {
     await new Promise((resolve, reject) => {
       execCommand(terminalCommand)
         .then(() => {
-          console.log(String(langData("OpenedSuccessfully")).replace("${toolDisplayName}", toolDisplayName));
+          console.log(String(langData("OpenedSuccessfully")).replace("${toolDisplayName}", `\u001b[1;32m${toolDisplayName}\u001b[1;0m`));
           resolve();
         })
         .catch(error => {
@@ -326,15 +326,15 @@ async function clear(options = {}) {
   if (Object.keys(options).length > 20) {
     throw new OptionsError(langData("NodeVersion")).toString();
   }
-  
+
   checkLatestVersion();
   let totalFilesDeleted = 0;
-
   const folders = await getDefaultFolders();
 
   if (clearWindowsOld) {
     folders.push("c:\\windows.old");
   }
+  
   if (clearWindows10Upgrade) {
     folders.push("c:\\Windows10Upgrade");
   }
@@ -344,7 +344,7 @@ async function clear(options = {}) {
       const filePath = `SpotifyInfo.txt`;
       const fileContent = langData("SpotifyInformation").toString();
       fs.promises.writeFile(filePath, fileContent, "utf8");
-      console.log(String(langData("FileCreatedAndContentWritten")).replace("${filePath}", filePath));
+      console.log(String(langData("FileCreatedAndContentWritten")).replace("${filePath}", `\u001b[1;32m${filePath}\u001b[1;0m`));
     } catch (error) {
       logError(langData("AnErrorOccurred"), error);
     }
@@ -377,21 +377,41 @@ async function clear(options = {}) {
     try {
       const files = await listFilesInFolder(folder);
       if (files.length > 0) {
-        console.log(String(langData("DeletingFilesInFolder")).replace("${folder}", folder));
+        console.log(String(langData("DeletingFilesInFolder")).replace("${folder}", `\u001b[1;34m${folder}\u001b[1;0m`));
         await Promise.all(files.map(async (file) => {
-          const filePath = `${folder}/${file}`;
+          const filePath = `${folder}\\${file}`;
           await deleteFile(filePath);
           totalFilesDeleted++;
         }));
       } else {
-        console.log(String(langData("ThereAreNoFilesIn")).replace("${folder}", folder));
+        console.log(String(langData("ThereAreNoFilesIn")).replace("${folder}", `\u001b[1;31m${folder}\u001b[1;0m`));
       }
     } catch (error) {
-      logError(String(langData("ErrorHandlingFolder")).replace("${folder}", folder), error);
+      logError(String(langData("ErrorHandlingFolder")).replace("${folder}", `\u001b[1;31m${folder}\u001b[1;0m`), error);
     }
   });
 
   await Promise.all(folderPromises);
-  console.log(String(langData("InformationLog")).replace("${totalFilesDeleted}", totalFilesDeleted).replace("${successfulDeletions}", successfulDeletions));
+  console.log(
+    String(langData("InformationLog"))
+      .replace(
+        "${files}",
+        folders.length == 0
+          ? `\u001b[1;31m${folders.length.toString()}\u001b[1;0m`
+          : `\u001b[1;33m${folders.length.toString()}\u001b[1;0m`
+      )
+      .replace(
+        "${totalFilesDeleted}",
+        totalFilesDeleted == 0
+          ? `\u001b[1;31m${totalFilesDeleted}\u001b[1;0m`
+          : `\u001b[1;32m${totalFilesDeleted}\u001b[1;0m`
+      )
+      .replace(
+        "${successfulDeletions}",
+        successfulDeletions == 0
+          ? `\u001b[1;31m${successfulDeletions}\u001b[1;0m`
+          : `\u001b[1;32m${successfulDeletions}\u001b[1;0m`
+      )
+  );
 }
 module.exports = { clear };
