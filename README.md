@@ -4,7 +4,7 @@
 
 This script was created to restore the computer to the fast, pure and tidy performance it had when it was first purchased.
 
-- **Version:** 1.0.0
+- **Version:** 1.0.1
 - **License:** MIT
 - **Copyright:** (c) 2023 Sasprosko/Umut
 
