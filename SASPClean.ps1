@@ -24,36 +24,36 @@ $loadingLabelPackageJson.Location = New-Object System.Drawing.Point(20, 45)
 $loadingForm.Controls.Add($loadingLabelPackageJson)
 
 $loadingForm.add_Shown({
-        $iconFolder = Join-Path $scriptDirectory "icon"
-        if (-not (Test-Path $iconFolder -PathType Container)) {
-            [System.Windows.Forms.MessageBox]::Show("Error: 'icon' folder not found.", "Folder Not Found", "OK", "Error")
-        }
+    $iconFolder = Join-Path $scriptDirectory "icon"
+    if (-not (Test-Path $iconFolder -PathType Container)) {
+        [System.Windows.Forms.MessageBox]::Show("Error: 'icon' folder not found.", "Folder Not Found", "OK", "Error")
+    }
 
-        $iconPath = Join-Path $scriptDirectory "icon\SASPClean.png"
-        if (-not (Test-Path $iconPath -PathType Leaf)) {
-            [System.Windows.Forms.MessageBox]::Show("Error: 'icon\SASPClean.png' not found.", "File Not Found", "OK", "Error")
-        }
+    $iconPath = Join-Path $scriptDirectory "icon\SASPClean.png"
+    if (-not (Test-Path $iconPath -PathType Leaf)) {
+        [System.Windows.Forms.MessageBox]::Show("Error: 'icon\SASPClean.png' not found.", "File Not Found", "OK", "Error")
+    }
 
-        $packageJsonPath = Join-Path $scriptDirectory "package.json"
-        $packageJsonExists = Test-Path $packageJsonPath
-        if (-not $packageJsonExists) {
-            [System.Windows.Forms.MessageBox]::Show("Error: 'package.json' not found.", "File Not Found", "OK", "Error")
-        }
+    $packageJsonPath = Join-Path $scriptDirectory "package.json"
+    $packageJsonExists = Test-Path $packageJsonPath
+    if (-not $packageJsonExists) {
+        [System.Windows.Forms.MessageBox]::Show("Error: 'package.json' not found.", "File Not Found", "OK", "Error")
+    }
 
-        $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/sasprosko590/SASPClean/releases/latest"
-        if ($packageJsonExists) {
-            $packageJson = Get-Content -Path $packageJsonPath | ConvertFrom-Json
-            $currentVersion = $packageJson.version
+    $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/sasprosko590/SASPClean/releases/latest"
+    if ($packageJsonExists) {
+        $packageJson = Get-Content -Path $packageJsonPath | ConvertFrom-Json
+        $currentVersion = "V" +$packageJson.version
 
-            if ($latestRelease.tag_name -ne $currentVersion) {
-                $updateMessage = "A new version is available! Do you want to view the release?"
-                $userChoice = [System.Windows.Forms.MessageBox]::Show($updateMessage, "Update Available", "YesNo", "Information")
+        if ($latestRelease.tag_name -ne $currentVersion) {
+            $updateMessage = "A new version is available! Do you want to view the release?"
+            $userChoice = [System.Windows.Forms.MessageBox]::Show($updateMessage, "Update Available", "YesNo", "Information")
 
-                if ($userChoice -eq "Yes") {
-                    Start-Process $latestRelease.html_url
-                }
+            if ($userChoice -eq "Yes") {
+                Start-Process $latestRelease.html_url
             }
         }
+    }
     $loadingForm.Close()
 })
 
