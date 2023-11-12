@@ -10,6 +10,7 @@ This script was created to restore the computer to the fast, pure and tidy perfo
 
 ### Notes
 
+- The translations may not be correct because I translated them with a translation program. I apologize in advance.
 - I don't have any bad intentions, there is no bad software in the code, and there is no such thing as taking the user's name in the code.
 - Update your drivers.
 - Close unnecessary startup programs in the task manager.

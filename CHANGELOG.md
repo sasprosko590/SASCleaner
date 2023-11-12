@@ -1,5 +1,7 @@
 # CHANGELOG
 
+Version V1.0.1 = Statistics updated. `start.bat` updated. Added `SASPClean.ps1` and added icon for it. Added `SASPClean.ps1` and added icon for it. AUTHORS.md updated.
+
 Version V1.0.0 = Added colored text (I don't know how to add it for cmd). Edited file deletion. Hacker control was added to index.test.js because it was forgotten to be added.
 
 Version V0.0.9 = Edited "winget upgrade --all" because it was misspelled and changed to "winget upgrade --all"
