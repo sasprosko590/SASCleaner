@@ -24,7 +24,6 @@ You can run it by opening the file named `SASPStart.exe` in the folder.
 - Empty the recycle bin.
 
 Recommended section in View Settings;
-
 If it does not work, open c'md' or 'run' and type 'control.exe sysdm.cpl,,3'. If that fails, type "Adjust the appearance and performance of Windows".
 
 - ✅ Custom:

@@ -1,6 +1,6 @@
 {
   "name": "saspclean",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This script was created to restore the computer to the fast, pure and regular performance as it was when it was first purchased.",
   "main": "index.js",
   "scripts": {

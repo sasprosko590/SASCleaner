@@ -24,38 +24,38 @@ $loadingLabelPackageJson.Location = New-Object System.Drawing.Point(20, 45)
 $loadingForm.Controls.Add($loadingLabelPackageJson)
 
 $loadingForm.add_Shown({
-    $iconFolder = Join-Path $scriptDirectory "icon"
-    if (-not (Test-Path $iconFolder -PathType Container)) {
-        [System.Windows.Forms.MessageBox]::Show("Error: 'icon' folder not found.", "Folder Not Found", "OK", "Error")
-    }
+        $iconFolder = Join-Path $scriptDirectory "icon"
+        if (-not (Test-Path $iconFolder -PathType Container)) {
+            [System.Windows.Forms.MessageBox]::Show("Error: 'icon' folder not found.", "Folder Not Found", "OK", "Error")
+        }
 
-    $iconPath = Join-Path $scriptDirectory "icon\SASPClean.png"
-    if (-not (Test-Path $iconPath -PathType Leaf)) {
-        [System.Windows.Forms.MessageBox]::Show("Error: 'icon\SASPClean.png' not found.", "File Not Found", "OK", "Error")
-    }
+        $iconPath = Join-Path $scriptDirectory "icon\SASPClean.png"
+        if (-not (Test-Path $iconPath -PathType Leaf)) {
+            [System.Windows.Forms.MessageBox]::Show("Error: 'icon\SASPClean.png' not found.", "File Not Found", "OK", "Error")
+        }
 
-    $packageJsonPath = Join-Path $scriptDirectory "package.json"
-    $packageJsonExists = Test-Path $packageJsonPath
-    if (-not $packageJsonExists) {
-        [System.Windows.Forms.MessageBox]::Show("Error: 'package.json' not found.", "File Not Found", "OK", "Error")
-    }
+        $packageJsonPath = Join-Path $scriptDirectory "package.json"
+        $packageJsonExists = Test-Path $packageJsonPath
+        if (-not $packageJsonExists) {
+            [System.Windows.Forms.MessageBox]::Show("Error: 'package.json' not found.", "File Not Found", "OK", "Error")
+        }
 
-    $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/sasprosko590/SASPClean/releases/latest"
-    if ($packageJsonExists) {
-        $packageJson = Get-Content -Path $packageJsonPath | ConvertFrom-Json
-        $currentVersion = "V" +$packageJson.version
+        $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/sasprosko590/SASPClean/releases/latest"
+        if ($packageJsonExists) {
+            $packageJson = Get-Content -Path $packageJsonPath | ConvertFrom-Json
+            $currentVersion = "V" + $packageJson.version
 
-        if ($latestRelease.tag_name -ne $currentVersion) {
-            $updateMessage = "A new version is available! Do you want to view the release?"
-            $userChoice = [System.Windows.Forms.MessageBox]::Show($updateMessage, "Update Available", "YesNo", "Information")
+            if ($latestRelease.tag_name -ne $currentVersion) {
+                $updateMessage = "A new version is available! Do you want to view the release?"
+                $userChoice = [System.Windows.Forms.MessageBox]::Show($updateMessage, "Update Available", "YesNo", "Information")
 
-            if ($userChoice -eq "Yes") {
-                Start-Process $latestRelease.html_url
+                if ($userChoice -eq "Yes") {
+                    Start-Process $latestRelease.html_url
+                }
             }
         }
-    }
-    $loadingForm.Close()
-})
+        $loadingForm.Close()
+    })
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "SASPClean"
@@ -82,8 +82,7 @@ $checkboxOptions = @(
     "DISM Add Packages - Adds Windows packages from a specified path to enhance system functionality.",
     "DISM Check Health - Evaluates the health of the Windows image, ensuring the stability of system components.",
     "DISM Get Packages - Lists all installed packages on the Windows image, providing an overview of system components.",
-    "DISM Repair - Repairs the Windows image using a specified source, fixing potential issues in the system.",
-    "DISM Repair 2 - Repairs the Windows image using an alternative specified source, ensuring system stability.",
+    "DISM Repair - It will check your system for missing files, malicious files, windows files, etc., repair and download anything that is missing.",
     "DISM Restore Health - Restores the health of the Windows image, addressing any detected inconsistencies.",
     "Disk Cleaner - Opens the built-in Disk Cleanup utility, allowing removal of unnecessary files to free up disk space.",
     "Disk Cleaner Sagerun -  Executes the Disk Cleanup utility with predefined cleanup options, streamlining the removal of temporary files.",
@@ -94,6 +93,9 @@ $checkboxOptions = @(
     "Upgrade winget - Utilizes the Windows Package Manager (Winget) to upgrade all installed applications, ensuring you have the latest versions with improved features and security updates.",
     "Check Win Update - Looks for the latest Windows updates right away, ensuring your system is current with essential patches and improvements.",
     "See if you have been hacked - Verifies possible security breaches on your system.",
+    "High performance - Open the 'Power options' tab and select high performance.",
+    "Game Mode - Open the tab called 'game mode settings' and activate 'game mode' in it.",
+    "Performance Options - Open the 'View settings' tab and turn it on and off as you wish, my suggestion is to look at `README.md` from github."
     "Initiate file cleanup - Deletes specific files, including those in the Prefetch, Temp, and %temp% directories, freeing up disk space and removing temporary files that are no longer needed."
 )
 
@@ -135,6 +137,7 @@ $runButton.Add_Click({
                     }
                     "Clear Windows Update*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /startcomponentcleanup" -Wait
+                        Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /spsuperseded" -Wait
                     }
                     "Disk Cleaner*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "cleanmgr.exe" -Wait
@@ -153,8 +156,7 @@ $runButton.Add_Click({
                     }
                     "DISM Repair*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\path\to\source /limitaccess" -Wait
-                    }
-                    "DISM Repair 2*" { 
+                        Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\RepairSource\Windows /limitaccess" -Wait
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\path\to\repairsource\install.wim" -Wait
                     }
                     "DISM Restore Health*" { 
@@ -171,6 +173,15 @@ $runButton.Add_Click({
                     }
                     "See if you have been hacked*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "quser" -Wait
+                    }
+                    "High Performance*" {
+                        Start-Process "powercfg.cpl" -Verb RunAs
+                    }
+                    "Game Mode*" {
+                        Start-Process 'ms-settings:gaming-gamemode'
+                    }
+                    "Performance Options" {
+                        Start-Process 'control.exe sysdm.cpl,,3'
                     }
                     "Upgrade winget*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "winget upgrade --all" -Wait
