@@ -4,9 +4,9 @@ const fs = require("fs");
 async function runExample() {
   try {
     const options = {
-      clearSpotifyData: true,
-      clearWindows10Upgrade: true,
-      clearWindowsOld: true,
+      clearSpotifyData: false,
+      clearWindows10Upgrade: false,
+      clearWindowsOld: false,
       clearWindowsUpdate: false,
       hackCheck: false,
       openCDF: false,
