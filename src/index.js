@@ -218,7 +218,9 @@ async function listFilesInFolder(folderPath) {
   }
 }
 
+let totalDetectedFiles = 0;
 let successfulDeletions = 0;
+let unsuccessfulDeletions = 0;
 
 /**
  * Deletes a file asynchronously.
@@ -236,9 +238,11 @@ async function deleteFile(filePath) {
       successfulDeletions++;
       console.log(String(langData("FilesDeletedSuccesfully")).replace("${filePath}", `\u001b[1;32m${filePath}\u001b[1;0m`));
     } else {
+      unsuccessfulDeletions++
       console.log(String(langData("FileDoesNotExist").replace("${filePath}", `\u001b[1;31m${filePath}\u001b[1;0m`)));
     }
   } catch (error) {
+    unsuccessfulDeletions++;
     return;
   }
 }
@@ -351,7 +355,7 @@ async function clear(options = {}) {
   }
 
   try {
-    if (clearWindowsUpdate) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /startcomponentcleanup' -Wait }\"", "Windows Update");
+    if (clearWindowsUpdate) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /startcomponentcleanup' -Wait }\"", "Clear Windows Update"), await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /spsuperseded' -Wait }\"", "Clear Windows Update 2");
     if (hackCheck) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/k', 'quser' -Wait }\"", "Hack Check")
     if (openCDF) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /f' -Wait }\"", "Check Disk");
     if (openCDR) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'chkdsk /r' -Wait }\"", "Check Disk");
@@ -359,7 +363,7 @@ async function clear(options = {}) {
     if (openDismAddPackages) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /add-package /packagepath:C:\\path\\to\\update.cab' -Wait }\"", "DISM Add Packages");
     if (openDismCheckHealth) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /checkhealth' -Wait }\"", "DISM Check Health");
     if (openDismGetPackages) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /get-packages' -Wait }\"", "DISM Get Packages");
-    if (openDismRepair) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\source /limitaccess' -Wait }\"", "DISM Repair"), await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\repairsource\\install.wim' -Wait }\"", "DISM Repair 2");
+    if (openDismRepair) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\source /limitaccess' -Wait }\"", "DISM Repair"), await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\path\\to\\repairsource\\install.wim' -Wait }\"", "DISM Repair 2"), await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth /source:C:\\RepairSource\\Windows /limitaccess' -Wait }\"", "DISM Repair 3");
     if (openDismRestoreHealth) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'dism /online /cleanup-image /restorehealth' -Wait }\"", "DISM Restore Health");
     if (openDiskCleaner) await openTool("cleanmgr.exe", "Disk Cleaner");
     if (openDiskCleanerSageRun) await openTool("powershell -Command \"& { Start-Process cmd.exe -Verb RunAs -ArgumentList '/c', 'cleanmgr /sagerun:1' -Wait }\"", "Disk Cleaner Sagerun");
@@ -376,6 +380,7 @@ async function clear(options = {}) {
   const folderPromises = folders.map(async (folder) => {
     try {
       const files = await listFilesInFolder(folder);
+      totalDetectedFiles += files.length
       if (files.length > 0) {
         console.log(String(langData("DeletingFilesInFolder")).replace("${folder}", `\u001b[1;34m${folder}\u001b[1;0m`));
         await Promise.all(files.map(async (file) => {
@@ -384,6 +389,7 @@ async function clear(options = {}) {
           totalFilesDeleted++;
         }));
       } else {
+        unsuccessfulDeletions++
         console.log(String(langData("ThereAreNoFilesIn")).replace("${folder}", `\u001b[1;31m${folder}\u001b[1;0m`));
       }
     } catch (error) {
@@ -411,6 +417,12 @@ async function clear(options = {}) {
         successfulDeletions == 0
           ? `\u001b[1;31m${successfulDeletions}\u001b[1;0m`
           : `\u001b[1;32m${successfulDeletions}\u001b[1;0m`
+      )
+      .replace(
+        "${unsuccessfulDeletions}",
+        unsuccessfulDeletions == 0
+          ? `\u001b[1;32m${unsuccessfulDeletions}\u001b[1;0m`
+          : `\u001b[1;31m${unsuccessfulDeletions}\u001b[1;0m`
       )
   );
 }
