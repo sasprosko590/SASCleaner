@@ -2,6 +2,7 @@ const fs = require("fs");
 
 /**
  * Custom error class for options-related errors.
+ * 
  * @since 0.0.7
  * @extends Error
  */
@@ -14,6 +15,7 @@ class OptionsError extends Error {
 
 /**
  * Gets the current date and time in a formatted string.
+ * 
  * @since 0.0.7
  * @returns {string} The current date and time.
  */
@@ -22,7 +24,8 @@ function getCurrentTime() {
 }
 
 /**
- * Asynchronously logs error messages to a file.
+ * Logs error messages to a file.
+ * 
  * @param {...(string|Error|{error: string})} messages - The messages to be logged.
  * @since 0.0.7
  * @throws {Error} Throws an error if there is an issue writing to the log file.
