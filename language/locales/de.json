@@ -24,7 +24,7 @@
   "DeletingFilesInFolder": "Lösche Dateien in ${folder}:",
   "ThereAreNoFilesIn": "In ${folder} gibt es keine Dateien zum Löschen",
   "ErrorHandlingFolder": "Fehler beim Bearbeiten des Ordners ${folder}:",
-  "InformationLog": "Aus Datei ${files}: ${totalFilesDeleted} Dateien gefunden, ${successfulDeletions} Dateien gelöscht.",
+  "InformationLog": "Aus der Datei ${files}: ${totalFilesDeleted} Dateien gefunden, ${successfulDeletions} Dateien gelöscht, ${unsuccessfulDeletions} Dateien nicht gelöscht.",
   "SpotifyInformation": "Sie können in die Spotify-Anwendung gehen, zum Abschnitt \"Einstellungen\" gehen und es über die Option \"Cache löschen\" löschen. Sie können auch \"Downloads\" im gleichen Abschnitt löschen.",
   "Version": "Ihre Version: V${version} | Neueste Version: ${latestVersion}",
   "Links": "Links:"
