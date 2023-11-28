@@ -8,6 +8,10 @@ SASPClean is designed to make your computer faster, performant and smoother. Not
 
 ### How does it work and which platforms does it work on?
 
+Programs to be installed for it to work;
+
+- [Node.js](https://nodejs.org/en/download)
+
 You can run it by opening the file named `SASPStart.exe` in the folder.
 
 **Platforms;**
@@ -24,6 +28,7 @@ You can run it by opening the file named `SASPStart.exe` in the folder.
 - Empty the recycle bin.
 
 Recommended section in View Settings;
+
 If it does not work, open c'md' or 'run' and type 'control.exe sysdm.cpl,,3'. If that fails, type "Adjust the appearance and performance of Windows".
 
 - ✅ Custom:
