@@ -1,5 +1,7 @@
 # CHANGELOG
 
+Version V1.0.3 = new options added.
+
 Version V1.0.2 = New cmd commands added. Replaced .bat with .exe and updated the name to `SASPStart`. `README.md` has been updated.
 
 Version V1.0.1 = Statistics updated. `start.bat` updated. Added `SASPClean.ps1` and added icon for it. Added `SASPClean.ps1` and added icon for it. AUTHORS.md updated.
