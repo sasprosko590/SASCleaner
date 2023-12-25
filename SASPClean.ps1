@@ -84,6 +84,7 @@ $checkboxOptions = @(
     "DISM Get Packages - Lists all installed packages on the Windows image, providing an overview of system components.",
     "DISM Repair - It will check your system for missing files, malicious files, windows files, etc., repair and download anything that is missing.",
     "DISM Restore Health - Restores the health of the Windows image, addressing any detected inconsistencies.",
+    "DISM Update - Updates your DISM."
     "Disk Cleaner - Opens the built-in Disk Cleanup utility, allowing removal of unnecessary files to free up disk space.",
     "Disk Cleaner Sagerun -  Executes the Disk Cleanup utility with predefined cleanup options, streamlining the removal of temporary files.",
     "MDT (Windows Memory Diagnostic Tool) -  Opens the Windows Memory Diagnostic Tool, allowing you to assess and diagnose potential issues related to your system's memory (RAM).",
@@ -95,7 +96,7 @@ $checkboxOptions = @(
     "See if you have been hacked - Verifies possible security breaches on your system.",
     "High performance - Open the 'Power options' tab and select high performance.",
     "Game Mode - Open the tab called 'game mode settings' and activate 'game mode' in it.",
-    "Performance Options - Open the 'View settings' tab and turn it on and off as you wish, my suggestion is to look at `README.md` from github."
+    "Performance Options Tab and Performance Optimization - Open the 'View settings' tab and turn it on and off as you wish, my suggestion is to look at `README.md` from github."
     "Initiate file cleanup - Deletes specific files, including those in the Prefetch, Temp, and %temp% directories, freeing up disk space and removing temporary files that are no longer needed."
 )
 
@@ -159,6 +160,9 @@ $runButton.Add_Click({
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\RepairSource\Windows /limitaccess" -Wait
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\path\to\repairsource\install.wim" -Wait
                     }
+                    "DISM Update*" {
+                        Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /checkhealth" -Wait
+                    }
                     "DISM Restore Health*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth" -Wait
                     }
@@ -180,8 +184,9 @@ $runButton.Add_Click({
                     "Game Mode*" {
                         Start-Process 'ms-settings:gaming-gamemode'
                     }
-                    "Performance Options" {
-                        Start-Process 'control.exe sysdm.cpl,,3'
+                    "Performance Options Tab and Performance Optimization*" {
+                        SystemPropertiesPerformance
+                        Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase" -Wait
                     }
                     "Upgrade winget*" { 
                         Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "winget upgrade --all" -Wait
