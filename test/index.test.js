@@ -1,6 +1,5 @@
 const cleaner = require("../src/index.js");
 const logError = require("../errors/error.js").logError;
-const fs = require("fs");
 async function runExample() {
   try {
     const options = {
@@ -9,21 +8,15 @@ async function runExample() {
       clearWindowsOld: false,
       clearWindowsUpdate: false,
       hackCheck: false,
-      openCDF: false,
-      openCDR: false,
-      openCDX: false,
+      checkDisk: false,
       openDiskCleaner: false,
       openDiskCleanerSageRun: false,
-      openDismAddPackages: false,
-      openDismCheckHealth: false,
-      openDismGetPackages: false,
-      openDismRepair: false,
-      openDismRestoreHealth: false,
+      openDismTools: false,
       openMDT: false,
       openMRT: false,
       openSFC: false,
       openWF: false,
-      openWingetUpgrade: false,
+      openUpgrade: false,
       updateCheckWindowsUpdate: false,
     };
 
@@ -32,5 +25,4 @@ async function runExample() {
     logError("Error during SASPClean:", error);
   }
 }
-
 runExample();
