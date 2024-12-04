@@ -1,4 +1,6 @@
 # CHANGELOG
+Version V1.0.5 = New Commands added. Errors have been fixed.
+
 Version V1.0.4 = We made a language application only for cmd. We brought this feature to the program. We tried to make the interface a little easier. We wrote code to show your system information and update your drivers and applications. Performance improvements have been made. Errors have been fixed. `error.js` has been updated, now it has better `error.log` information. New languages added and updated: Arabic, Russian, Spanish, Mandarin. Stay tuned for new updates. **Languages translated by ChatGPT.**
 
 Version V1.0.3 = new options added.
