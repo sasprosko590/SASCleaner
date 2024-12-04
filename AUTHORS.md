@@ -1,5 +1,4 @@
 # AUTHORS
 
 Sasprosko/Umut
-
 Wosy
