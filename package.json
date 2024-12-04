@@ -7,12 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Sasprosko, Wosy",
+  "author": "Sasprosko/Umut",
   "license": "MIT",
   "dependencies": {
     "intl": "^1.2.5",
     "node-fetch": "^3.3.2",
-    "user-agents": "^1.1.377"
+    "user-agents": "^1.1.378"
   },
   "directories": {
     "test": "test"
