@@ -43,7 +43,6 @@ $loadingForm.Text = $localeData.formTitle
 $loadingForm.Size = New-Object System.Drawing.Size(400, 150)
 $loadingForm.StartPosition = "CenterScreen"
 $loadingForm.BackColor = [System.Drawing.Color]::FromArgb(255, 245, 245, 245)
-
 $loadingLabelPackageJson = New-Object System.Windows.Forms.Label
 $loadingLabelPackageJson.Text = $localeData.loadingScreen.checkingUpdates
 $loadingLabelPackageJson.Font = New-Object System.Drawing.Font("Arial", 12, [System.Drawing.FontStyle]::Bold)
@@ -124,7 +123,6 @@ $checkboxOptions = @(
     $localeData.systemInfo,
     $localeData.initiateFileCleanup
 )
-
 $checkboxes = @{}
 $yPosition = 20
 
@@ -151,10 +149,13 @@ $runButton.Add_Click({
         if ($checkboxes[$option].Checked) {
             switch -wildcard ($option) {
                 $localeData.checkDisk { 
-                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "chkdsk /f && chkdsk /x && chkdsk /r" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "chkdsk /f" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "chkdsk /x" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "chkdsk /r" -Wait
                 }
                 $localeData.clearWindowsUpdate { 
-                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /startcomponentcleanup && dism /online /cleanup-image /spsuperseded" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /startcomponentcleanup" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /spsuperseded" -Wait
                 }
                 $localeData.diskCleaner { 
                     Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "cleanmgr.exe" -Wait
@@ -163,11 +164,16 @@ $runButton.Add_Click({
                     Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "cleanmgr /sagerun:1" -Wait
                 }
                 $localeData.dismTools { 
-                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /add-package /packagepath:C:\path\to\update.cab" -Wait
-                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /checkhealth" -Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /add-package /packagepath:C:\path\to\update.cab" -Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /checkhealth" -Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /get-packages"-Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\path\to\source /limitaccess"-Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\path\to\repairsource\install.wim" -Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth /source:C:\RepairSource\Windows /limitaccess" -Wait
+                    Start-Process -FilePath "cmd.exe" -Verb RunAs -ArgumentList "/c", "dism /online /cleanup-image /restorehealth" -Wait
                 }
                 $localeData.mdtTool { 
-                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "mdsched.exe" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "mdsched.exe" -Wait
                 }
                 $localeData.mrtTool { 
                     Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "mrt.exe" -Wait
@@ -176,7 +182,7 @@ $runButton.Add_Click({
                     Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "sfc /scannow" -Wait
                 }
                 $localeData.windowsExperienceIndex { 
-                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "winsat formal" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "winsat formal" -Wait
                 }
                 $localeData.upgradePackages { 
                     $chocoInstalled = Get-Command choco -ErrorAction SilentlyContinue
@@ -190,6 +196,7 @@ $runButton.Add_Click({
                 }
                 $localeData.checkWinUpdate { 
                     Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "wuauclt.exe /detectnow" -Wait
+                    Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/c", "wuauclt.exe /updatenow" -Wait
                 }
                 $localeData.checkHacked { 
                     Start-Process 'cmd.exe' -Verb RunAs -ArgumentList "/k", "quser" -Wait
