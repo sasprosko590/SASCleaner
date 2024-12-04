@@ -1,13 +1,13 @@
 {
   "name": "saspclean",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "This script was created to restore the computer to the fast, pure and regular performance as it was when it was first purchased.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Sasprosko/Umut",
+  "author": "Sasprosko/Umut/Wosy",
   "license": "MIT",
   "dependencies": {
     "intl": "^1.2.5",
