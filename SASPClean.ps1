@@ -72,7 +72,6 @@ $loadingForm.add_Shown({
         return
     }
     $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/sasprosko590/SASPClean/releases/latest"
-    
     if ($packageJsonExists) {
         $packageJson = Get-Content -Path $packageJsonPath | ConvertFrom-Json
         $currentVersion = "V" + $packageJson.version
